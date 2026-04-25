@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% block title %}Vérification des Faits — VeriDz{% endblock %}
+{% block nav_fact %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+.fc-header {
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--vd-border);
+    margin-bottom: 2.5rem;
+}
+.fc-input-panel {
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 10px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    margin-bottom: 2rem;
+}
+.fc-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--vd-border);
+    padding-bottom: 1rem;
+}
+.fc-tab {
+    font-family: var(--font-head);
+    font-size: 0.92rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: var(--vd-silver);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+}
+.fc-tab.active, .fc-tab:hover {
+    color: var(--vd-bright);
+    border-color: var(--vd-border);
+    background: rgba(59,130,246,0.08);
+}
+.fc-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+.char-count { font-family: var(--font-mono); font-size: 0.75rem; color: var(--vd-silver); text-align: right; margin-top: 0.3rem; }
+
+/* Result card */
+.result-card {
+    border-radius: 10px;
+    padding: 2rem;
+    border: 1px solid;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.4s ease;
+    backdrop-filter: blur(10px);
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.result-card.true      { background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.4); }
+.result-card.false     { background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.4); }
+.result-card.misleading{ background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.4); }
+.result-card.partial   { background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.4); }
+.result-card.unverifiable { background:rgba(107,114,128,0.07);border-color:rgba(107,114,128,0.4); }
+
+.verdict-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+.verdict-icon.true     { background:rgba(16,185,129,0.15);color:#10b981; }
+.verdict-icon.false    { background:rgba(239,68,68,0.15);color:#ef4444; }
+.verdict-icon.misleading{background:rgba(245,158,11,0.15);color:#f59e0b; }
+.verdict-icon.partial  { background:rgba(139,92,246,0.15);color:#8b5cf6; }
+.verdict-icon.unverifiable{background:rgba(107,114,128,0.15);color:#6b7280;}
+
+.verdict-title {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.verdict-title.true      { color: #34d399; }
+.verdict-title.false     { color: #f87171; }
+.verdict-title.misleading{ color: #fbbf24; }
+.verdict-title.partial   { color: #a78bfa; }
+.verdict-title.unverifiable { color: #9ca3af; }
+
+/* Confidence bar */
+.conf-bar-wrap {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin: 0.6rem 0 0.3rem;
+}
+.conf-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+.conf-bar.true     { background: linear-gradient(90deg, #10b981, #34d399); }
+.conf-bar.false    { background: linear-gradient(90deg, #ef4444, #f87171); }
+.conf-bar.misleading{background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.conf-bar.partial  { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.conf-bar.unverifiable{background:linear-gradient(90deg,#6b7280,#9ca3af);}
+
+.detail-section {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+}
+.detail-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--vd-bright);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.tag-pill {
+    display: inline-block;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid var(--vd-border);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.78rem;
+    color: var(--vd-silver);
+    margin: 0.2rem;
+    font-family: var(--font-body);
+}
+.tag-pill.red { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171; }
+
+/* Recent checks */
+.recent-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--vd-border);
+}
+.recent-row:last-child { border-bottom: none; }
+.mini-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Loading state */
+.analyzing-spinner {
+    display: none;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--vd-bright);
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    margin-top: 1rem;
+}
+.spinner-ring {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(59,130,246,0.2);
+    border-top-color: var(--vd-bright);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="fc-header">
+        <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--vd-bright);letter-spacing:2px;margin-bottom:0.5rem;">
+            VÉRIFICATION DES FAITS
+        </div>
+        <h1 class="vd-section-title mb-1">Détecteur de <span class="accent">Fausses Infos</span></h1>
+        <p class="text-vd-silver" style="max-width:560px;">
+            Soumettez un texte ou une URL — notre IA analysera la crédibilité et détectera les signes de désinformation.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Input panel -->
+            <div class="fc-input-panel">
+                <div class="fc-tabs">
+                    <button class="fc-tab active" onclick="switchTab('text', this)">
+                        <i class="bi bi-textarea-t me-2"></i>Texte
+                    </button>
+                    <button class="fc-tab" onclick="switchTab('url', this)">
+                        <i class="bi bi-link-45deg me-2"></i>URL
+                    </button>
+                </div>
+
+                {% if error %}
+                <div class="vd-alert vd-alert-danger mb-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+
+                <form method="post" id="fc-form" onsubmit="onSubmit()">
+                    {% csrf_token %}
+
+                    <!-- Text input -->
+                    <div id="text-panel">
+                        <label class="vd-label"><i class="bi bi-textarea-t me-1"></i>Collez le texte à analyser</label>
+                        <textarea name="text" id="fc-text" class="vd-form-control fc-textarea" 
+                                  placeholder="Copiez ici le texte de l'information ou de l'article que vous souhaitez vérifier…">{{ input_text }}</textarea>
+                        <div class="char-count"><span id="char-count">0</span> caractères</div>
+                    </div>
+
+                    <!-- URL input -->
+                    <div id="url-panel" style="display:none;">
+                        <label class="vd-label"><i class="bi bi-link-45deg me-1"></i>URL de l'article</label>
+                        <input type="url" name="url" id="fc-url" class="vd-form-control" 
+                               placeholder="https://exemple.com/article…" value="{{ input_url }}">
+                        <div class="char-count mt-2" style="text-align:left;color:rgba(192,200,224,0.5);">
+                            <i class="bi bi-info-circle me-1"></i>L'IA analysera le titre et le contexte de l'URL fournie.
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mt-3 flex-wrap">
+                        <button type="submit" class="btn-vd-primary" style="padding:0.65rem 2rem;" id="submit-btn">
+                            <i class="bi bi-robot me-2"></i>Analyser avec l'IA
+                        </button>
+                        <button type="button" onclick="clearForm()" class="btn-vd-outline" style="padding:0.65rem 1.2rem;">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser
+                        </button>
+                        <div class="analyzing-spinner" id="spinner">
+                            <div class="spinner-ring"></div>
+                            <span>Analyse en cours…</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result -->
+            {% if result %}
+            <div class="result-card {{ result.verdict }}">
+                <div class="row g-4 align-items-start">
+                    <div class="col-sm-auto">
+                        <div class="verdict-icon {{ result.verdict }}">
+                            {% if result.verdict == 'true' %}<i class="bi bi-check-lg"></i>
+                            {% elif result.verdict == 'false' %}<i class="bi bi-x-lg"></i>
+                            {% elif result.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle"></i>
+                            {% elif result.verdict == 'partial' %}<i class="bi bi-slash-circle"></i>
+                            {% else %}<i class="bi bi-question-lg"></i>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--vd-silver);letter-spacing:2px;margin-bottom:0.3rem;">VERDICT</div>
+                        <div class="verdict-title {{ result.verdict }}">
+                            {% if result.verdict == 'true' %}VRAI
+                            {% elif result.verdict == 'false' %}FAUX
+                            {% elif result.verdict == 'misleading' %}TROMPEUR
+                            {% elif result.verdict == 'partial' %}PARTIELLEMENT VRAI
+                            {% else %}NON VÉRIFIABLE{% endif %}
+                        </div>
+
+                        <!-- Confidence -->
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--vd-silver);">Score de confiance</span>
+                                <span style="font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--vd-white);">{{ result.confidence_pct }}%</span>
+                            </div>
+                            <div class="conf-bar-wrap">
+                                <div class="conf-bar {{ result.verdict }}" style="width:{{ result.confidence_pct }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation -->
+                <div class="detail-section mt-3">
+                    <div class="detail-label"><i class="bi bi-chat-text me-1"></i>Analyse</div>
+                    <p style="font-size:0.92rem;line-height:1.7;margin:0;color:rgba(232,238,255,0.9);">{{ result.explanation }}</p>
+                </div>
+
+                <!-- Key claims -->
+                {% if result_data.key_claims_list %}
+                    <div class="detail-section">
+                        <div class="detail-label"><i class="bi bi-list-check me-1"></i>Affirmations clés</div>
+                        {% for claim in result_data.key_claims_list %}
+                        <span class="tag-pill">{{ claim }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Red flags -->
+                {% if result_data.red_flags_list %}
+                    <div class="detail-section">
+                        <div class="detail-label" style="color:#f87171;"><i class="bi bi-flag me-1"></i>Signaux d'alerte</div>
+                        {% for flag in result_data.red_flags_list %}
+                        <span class="tag-pill red">⚠ {{ flag }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Sources -->
+                {% if result_data.sources_list %}
+                    <div class="detail-section">
+                        <div class="detail-label"><i class="bi bi-book me-1"></i>Sources recommandées</div>
+                        {% for src in result_data.sources_list %}
+                        <span class="tag-pill">{{ src }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="mt-3 d-flex gap-2 flex-wrap">
+                    <a href="/fact-check/" class="btn-vd-outline" style="font-size:0.85rem;padding:0.4rem 1rem;">
+                        <i class="bi bi-arrow-left me-1"></i>Nouvelle analyse
+                    </a>
+                    <a href="/fact-check/history/" class="btn-vd-outline" style="font-size:0.85rem;padding:0.4rem 1rem;">
+                        <i class="bi bi-clock-history me-1"></i>Historique
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- How it works -->
+            <div class="vd-card mb-3">
+                <div class="vd-card-title mb-3"><i class="bi bi-lightbulb me-2 text-vd-accent"></i>Comment ça marche ?</div>
+                <div style="font-size:0.88rem;color:var(--vd-silver);line-height:1.7;">
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="text-vd-accent font-mono">01.</span>
+                        <span>Collez le texte ou l'URL à vérifier</span>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="text-vd-accent font-mono">02.</span>
+                        <span>Notre IA (Claude) analyse le contenu</span>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="text-vd-accent font-mono">03.</span>
+                        <span>Obtenez un verdict et un score de confiance</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="text-vd-accent font-mono">04.</span>
+                        <span>Consultez les sources recommandées</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verdicts legend -->
+            <div class="vd-card mb-3">
+                <div class="vd-card-title mb-3"><i class="bi bi-info-circle me-2 text-vd-accent"></i>Signification des verdicts</div>
+                <div style="font-size:0.82rem;">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#34d399;font-size:1rem;">✓</span>
+                        <div><strong style="color:#34d399;">Vrai</strong> <span class="text-vd-silver">— Information vérifiée et exacte</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#f87171;font-size:1rem;">✗</span>
+                        <div><strong style="color:#f87171;">Faux</strong> <span class="text-vd-silver">— Clairement fausse ou inventée</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#fbbf24;font-size:1rem;">⚠</span>
+                        <div><strong style="color:#fbbf24;">Trompeur</strong> <span class="text-vd-silver">— Présenté de façon trompeuse</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#a78bfa;font-size:1rem;">≈</span>
+                        <div><strong style="color:#a78bfa;">Partiel</strong> <span class="text-vd-silver">— Partiellement vrai, nuances nécessaires</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span style="color:#9ca3af;font-size:1rem;">?</span>
+                        <div><strong style="color:#9ca3af;">Non vérifiable</strong> <span class="text-vd-silver">— Impossible à confirmer</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent checks -->
+            {% if recent_checks %}
+            <div class="vd-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="vd-card-title"><i class="bi bi-clock-history me-2 text-vd-accent"></i>Vérifications récentes</div>
+                    <a href="/fact-check/history/" class="text-vd-accent" style="font-size:0.78rem;">Voir tout</a>
+                </div>
+                {% for check in recent_checks %}
+                <div class="recent-row">
+                    <span class="mini-badge 
+                        {% if check.verdict == 'true' %}badge-verified
+                        {% elif check.verdict == 'false' %}badge-fake
+                        {% else %}badge-unverified{% endif %}">
+                        {% if check.verdict == 'true' %}✓ Vrai
+                        {% elif check.verdict == 'false' %}✗ Faux
+                        {% elif check.verdict == 'misleading' %}⚠ Trompeur
+                        {% else %}? N/V{% endif %}
+                    </span>
+                    <span style="font-size:0.82rem;color:var(--vd-silver);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        {{ check.input_text|truncatechars:50 }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let activeTab = 'text';
+
+function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('text-panel').style.display = tab === 'text' ? 'block' : 'none';
+    document.getElementById('url-panel').style.display = tab === 'url' ? 'block' : 'none';
+}
+
+// Character count
+const textarea = document.getElementById('fc-text');
+const counter = document.getElementById('char-count');
+if (textarea) {
+    textarea.addEventListener('input', () => counter.textContent = textarea.value.length);
+    counter.textContent = textarea.value.length;
+}
+
+function clearForm() {
+    if (textarea) textarea.value = '';
+    const urlInput = document.getElementById('fc-url');
+    if (urlInput) urlInput.value = '';
+    if (counter) counter.textContent = '0';
+}
+
+function onSubmit() {
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Analyse…';
+    document.getElementById('spinner').style.display = 'flex';
+}
+</script>
+{% endblock %}
