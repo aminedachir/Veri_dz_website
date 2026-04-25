@@ -1,48 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Mon Profil — VeriDz{% endblock %}
-
+{% block title %}ملفي الشخصي — فيري دي زد{% endblock %}
 {% block extra_css %}
 <style>
 .profile-page { padding: 2.5rem 0; }
 .profile-card { background: var(--vd-card-bg); border: 1px solid var(--vd-border); border-radius: 10px; padding: 2rem; backdrop-filter: blur(10px); }
-.avatar-circle {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--vd-blue), var(--vd-accent));
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-head); font-size: 2rem; font-weight: 700;
-    color: #fff; border: 2px solid var(--vd-border);
-    margin-bottom: 1rem;
-}
+.avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--vd-blue), var(--vd-accent)); display: flex; align-items: center; justify-content: center; font-family: var(--font-main); font-size: 2rem; font-weight: 800; color: #fff; border: 2px solid var(--vd-border); margin-bottom: 1rem; }
 .form-group { margin-bottom: 1.2rem; }
 input[type=text], input[type=email], textarea, input[type=file] {
-    background: rgba(10,15,46,0.7) !important;
-    border: 1px solid var(--vd-border) !important;
-    color: var(--vd-white) !important;
-    font-family: var(--font-body) !important;
-    border-radius: 4px !important;
-    padding: 0.65rem 1rem !important;
-    width: 100% !important;
+    background: rgba(10,15,46,0.7) !important; border: 1px solid var(--vd-border) !important;
+    color: var(--vd-white) !important; font-family: var(--font-body) !important;
+    border-radius: 4px !important; padding: 0.65rem 1rem !important; width: 100% !important; text-align: right !important;
 }
 input[type=text]:focus, input[type=email]:focus, textarea:focus {
-    outline: none !important;
-    border-color: var(--vd-bright) !important;
+    outline: none !important; border-color: var(--vd-bright) !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
 }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="container profile-page">
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="d-flex align-items-center gap-3 mb-3">
-                <a href="/dashboard/" class="text-vd-silver" style="text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+                <a href="/dashboard/" class="text-vd-silver" style="text-decoration:none;"><i class="bi bi-arrow-right me-1"></i>لوحة التحكم</a>
                 <span class="text-vd-silver">/</span>
-                <span class="text-vd-accent font-mono" style="font-size:0.85rem;">Profil</span>
+                <span class="text-vd-accent" style="font-size:0.85rem;">الملف الشخصي</span>
             </div>
 
-            <div class="vd-section-title mb-1">Mon <span class="accent">Profil</span></div>
+            <div class="vd-section-title mb-1">ملفي <span class="accent">الشخصي</span></div>
             <hr class="vd-divider">
 
             <div class="profile-card">
@@ -52,10 +37,10 @@ input[type=text]:focus, input[type=email]:focus, textarea:focus {
                     {% else %}
                     <div class="avatar-circle mx-auto">{{ user.username|first|upper }}</div>
                     {% endif %}
-                    <div class="font-head" style="font-size:1.2rem;color:var(--vd-white);">{{ user.username }}</div>
-                    <div class="font-mono" style="font-size:0.78rem;color:var(--vd-silver);">
-                        {% if user.is_staff %}Admin{% elif user.is_journalist %}Journaliste{% else %}Lecteur{% endif %}
-                        · Membre depuis {{ user.date_joined|date:"M Y" }}
+                    <div class="font-main" style="font-size:1.2rem;color:var(--vd-white);font-weight:700;">{{ user.username }}</div>
+                    <div class="text-vd-silver" style="font-size:0.82rem;font-family:var(--font-body);">
+                        {% if user.is_staff %}مدير{% elif user.is_journalist %}صحفي{% else %}قارئ{% endif %}
+                        · عضو منذ {{ user.date_joined|date:"M Y" }}
                     </div>
                 </div>
 
@@ -67,15 +52,23 @@ input[type=text]:focus, input[type=email]:focus, textarea:focus {
                     {% csrf_token %}
                     {% for field in form %}
                     <div class="form-group">
-                        <label class="vd-label">{{ field.label }}</label>
+                        <label class="vd-label">
+                            {% if field.name == 'first_name' %}الاسم الأول
+                            {% elif field.name == 'last_name' %}اللقب
+                            {% elif field.name == 'email' %}البريد الإلكتروني
+                            {% elif field.name == 'bio' %}نبذة عني
+                            {% elif field.name == 'organization' %}المؤسسة
+                            {% elif field.name == 'avatar' %}الصورة الشخصية
+                            {% else %}{{ field.label }}{% endif %}
+                        </label>
                         {{ field }}
                         {% if field.errors %}
-                        <div style="color:#f87171;font-size:0.8rem;margin-top:0.3rem;">{{ field.errors.0 }}</div>
+                        <div style="color:#f87171;font-size:0.82rem;margin-top:0.3rem;">{{ field.errors.0 }}</div>
                         {% endif %}
                     </div>
                     {% endfor %}
                     <button type="submit" class="btn-vd-primary" style="padding:0.65rem 2rem;">
-                        <i class="bi bi-check-lg me-2"></i>Enregistrer les modifications
+                        <i class="bi bi-check-lg me-2"></i>حفظ التعديلات
                     </button>
                 </form>
             </div>

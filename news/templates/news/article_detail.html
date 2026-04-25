@@ -1,53 +1,22 @@
 {% extends 'base.html' %}
-{% block title %}{{ article.title }} — VeriDz{% endblock %}
+{% block title %}{{ article.title }} — فيري دي زد{% endblock %}
 {% block nav_news %}active{% endblock %}
 
 {% block extra_css %}
 <style>
-.article-hero {
-    padding: 3rem 0 2rem;
-    border-bottom: 1px solid var(--vd-border);
-    margin-bottom: 2.5rem;
-}
-.breadcrumb-vd { font-family: var(--font-mono); font-size: 0.78rem; color: var(--vd-silver); margin-bottom: 1rem; }
+.article-hero { padding: 3rem 0 2rem; border-bottom: 1px solid var(--vd-border); margin-bottom: 2.5rem; }
+.breadcrumb-vd { font-family: var(--font-body); font-size: 0.82rem; color: var(--vd-silver); margin-bottom: 1rem; }
 .breadcrumb-vd a { color: var(--vd-bright); text-decoration: none; }
-.article-main-title {
-    font-family: var(--font-head);
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 700;
-    color: var(--vd-white);
-    line-height: 1.2;
-    margin-bottom: 1rem;
-}
-.article-body {
-    background: var(--vd-card-bg);
-    border: 1px solid var(--vd-border);
-    border-radius: 8px;
-    padding: 2rem;
-    font-size: 1rem;
-    line-height: 1.8;
-    color: rgba(232,238,255,0.9);
-    backdrop-filter: blur(10px);
-}
-.verdict-panel {
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid;
-}
+.article-main-title { font-family: var(--font-main); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 800; color: var(--vd-white); line-height: 1.3; margin-bottom: 1rem; }
+.article-body { background: var(--vd-card-bg); border: 1px solid var(--vd-border); border-radius: 8px; padding: 2rem; font-size: 1rem; line-height: 2; color: rgba(232,238,255,0.9); backdrop-filter: blur(10px); font-family: var(--font-body); }
+.verdict-panel { border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; border-right: 4px solid; border-left: none; }
 .verdict-panel.true    { background:rgba(16,185,129,0.08);border-color:#10b981; }
 .verdict-panel.false   { background:rgba(239,68,68,0.08);border-color:#ef4444; }
 .verdict-panel.misleading { background:rgba(245,158,11,0.08);border-color:#f59e0b; }
 .verdict-panel.partial { background:rgba(139,92,246,0.08);border-color:#8b5cf6; }
 .verdict-panel.unverified { background:rgba(107,114,128,0.08);border-color:#6b7280; }
-.verdict-label {
-    font-family: var(--font-head);
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-}
-.sidebar-card { margin-bottom: 1.2rem; }
-.stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--vd-border); font-size: 0.85rem; }
+.verdict-label { font-family: var(--font-main); font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; }
+.stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--vd-border); font-size: 0.88rem; font-family: var(--font-body); }
 .stat-row:last-child { border-bottom: none; }
 </style>
 {% endblock %}
@@ -56,128 +25,97 @@
 <div class="container">
     <div class="article-hero">
         <div class="breadcrumb-vd">
-            <a href="/">Accueil</a> / <a href="/news/">Actualités</a> / {{ article.title|truncatechars:40 }}
+            <a href="/">الرئيسية</a> / <a href="/news/">الأخبار</a> / {{ article.title|truncatechars:40 }}
         </div>
         <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
             {% if article.category %}
-            <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--vd-bright);border:1px solid var(--vd-border);border-radius:3px;padding:0.2rem 0.6rem;">
+            <span style="font-family:var(--font-body);font-size:0.78rem;color:var(--vd-bright);border:1px solid var(--vd-border);border-radius:3px;padding:0.2rem 0.6rem;">
                 <i class="bi {{ article.category.icon }} me-1"></i>{{ article.category.name }}
             </span>
             {% endif %}
             {% if article.is_verified %}
-            <span class="badge-verified"><i class="bi bi-check-circle me-1"></i>Vérifié</span>
+            <span class="badge-verified"><i class="bi bi-check-circle me-1"></i>محقق</span>
             {% else %}
-            <span class="badge-unverified">En attente de vérification</span>
+            <span class="badge-unverified">قيد الانتظار</span>
             {% endif %}
         </div>
         <h1 class="article-main-title">{{ article.title }}</h1>
-        <div class="d-flex flex-wrap gap-3 align-items-center" style="font-family:var(--font-mono);font-size:0.8rem;color:var(--vd-silver);">
+        <div class="d-flex flex-wrap gap-3 align-items-center" style="font-family:var(--font-body);font-size:0.83rem;color:var(--vd-silver);">
             <span><i class="bi bi-person me-1 text-vd-accent"></i>{{ article.author.username }}</span>
             <span><i class="bi bi-calendar3 me-1"></i>{{ article.created_at|date:"d F Y" }}</span>
-            <span><i class="bi bi-eye me-1"></i>{{ article.views_count }} vues</span>
+            <span><i class="bi bi-eye me-1"></i>{{ article.views_count }} مشاهدة</span>
             {% if article.source_url %}
-            <a href="{{ article.source_url }}" target="_blank" style="color:var(--vd-bright);"><i class="bi bi-link-45deg me-1"></i>Source</a>
+            <a href="{{ article.source_url }}" target="_blank" style="color:var(--vd-bright);"><i class="bi bi-link-45deg me-1"></i>المصدر</a>
             {% endif %}
         </div>
     </div>
 
     <div class="row g-4">
-        <!-- Main content -->
         <div class="col-lg-8">
             {% if article.image %}
-            <img src="{{ article.image.url }}" alt="{{ article.title }}" 
-                 style="width:100%;border-radius:8px;border:1px solid var(--vd-border);margin-bottom:1.5rem;max-height:400px;object-fit:cover;">
+            <img src="{{ article.image.url }}" alt="{{ article.title }}" style="width:100%;border-radius:8px;border:1px solid var(--vd-border);margin-bottom:1.5rem;max-height:400px;object-fit:cover;">
             {% endif %}
 
-            <!-- Verdict panel -->
             {% if article.verdict != 'unverified' %}
             <div class="verdict-panel {{ article.verdict }}">
                 <div class="verdict-label">
-                    {% if article.verdict == 'true' %}<i class="bi bi-check-circle me-2" style="color:#10b981;"></i>VRAI
-                    {% elif article.verdict == 'false' %}<i class="bi bi-x-circle me-2" style="color:#ef4444;"></i>FAUX
-                    {% elif article.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle me-2" style="color:#f59e0b;"></i>TROMPEUR
-                    {% elif article.verdict == 'partial' %}<i class="bi bi-slash-circle me-2" style="color:#8b5cf6;"></i>PARTIELLEMENT VRAI
+                    {% if article.verdict == 'true' %}<i class="bi bi-check-circle me-2" style="color:#10b981;"></i>صحيح
+                    {% elif article.verdict == 'false' %}<i class="bi bi-x-circle me-2" style="color:#ef4444;"></i>خاطئ
+                    {% elif article.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle me-2" style="color:#f59e0b;"></i>مضلل
+                    {% elif article.verdict == 'partial' %}<i class="bi bi-slash-circle me-2" style="color:#8b5cf6;"></i>صحيح جزئياً
                     {% endif %}
                 </div>
                 {% if article.verdict_explanation %}
-                <p style="font-size:0.9rem;margin:0;opacity:0.85;">{{ article.verdict_explanation }}</p>
+                <p style="font-size:0.92rem;margin:0;opacity:0.85;font-family:var(--font-body);line-height:1.8;">{{ article.verdict_explanation }}</p>
                 {% endif %}
             </div>
             {% endif %}
 
-            <!-- Article body -->
-            <div class="article-body">
-                {{ article.content|linebreaks }}
-            </div>
+            <div class="article-body">{{ article.content|linebreaks }}</div>
 
-            <!-- Share -->
             <div class="vd-card mt-3 d-flex align-items-center gap-3 flex-wrap">
-                <span class="font-head text-vd-silver" style="font-size:0.9rem;">Partager :</span>
-                <a href="https://twitter.com/intent/tweet?text={{ article.title|urlencode }}&url={{ request.build_absolute_uri }}" 
-                   target="_blank" class="btn-vd-outline" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
-                   <i class="bi bi-twitter-x me-1"></i>Twitter
+                <span class="font-main text-vd-silver" style="font-size:0.92rem;">مشاركة:</span>
+                <a href="https://twitter.com/intent/tweet?text={{ article.title|urlencode }}&url={{ request.build_absolute_uri }}" target="_blank" class="btn-vd-outline" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
+                   <i class="bi bi-twitter-x me-1"></i>تويتر
                 </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
-                   target="_blank" class="btn-vd-outline" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
-                   <i class="bi bi-facebook me-1"></i>Facebook
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn-vd-outline" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
+                   <i class="bi bi-facebook me-1"></i>فيسبوك
                 </a>
-                <a href="/fact-check/?url={{ request.build_absolute_uri }}" class="btn-vd-primary" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
-                    <i class="bi bi-shield-check me-1"></i>Vérifier cet article
+                <a href="/fact-check/" class="btn-vd-primary" style="font-size:0.82rem;padding:0.35rem 0.9rem;">
+                    <i class="bi bi-shield-check me-1"></i>تحقق من هذا المقال
                 </a>
             </div>
         </div>
 
-        <!-- Sidebar -->
         <div class="col-lg-4">
-            <!-- Article info -->
-            <div class="vd-card sidebar-card">
-                <div class="vd-card-title mb-3"><i class="bi bi-info-circle me-2 text-vd-accent"></i>Informations</div>
+            <div class="vd-card mb-3">
+                <div class="vd-card-title mb-3"><i class="bi bi-info-circle me-2 text-vd-accent"></i>معلومات المقال</div>
+                <div class="stat-row"><span class="text-vd-silver">الكاتب</span><span class="text-vd-accent">{{ article.author.username }}</span></div>
+                <div class="stat-row"><span class="text-vd-silver">تاريخ النشر</span><span>{{ article.created_at|date:"d/m/Y" }}</span></div>
+                <div class="stat-row"><span class="text-vd-silver">آخر تعديل</span><span>{{ article.updated_at|date:"d/m/Y" }}</span></div>
+                <div class="stat-row"><span class="text-vd-silver">المشاهدات</span><span class="text-vd-accent">{{ article.views_count }}</span></div>
                 <div class="stat-row">
-                    <span class="text-vd-silver">Auteur</span>
-                    <span class="text-vd-accent font-mono">{{ article.author.username }}</span>
-                </div>
-                <div class="stat-row">
-                    <span class="text-vd-silver">Publié le</span>
-                    <span class="font-mono" style="font-size:0.8rem;">{{ article.created_at|date:"d/m/Y" }}</span>
-                </div>
-                <div class="stat-row">
-                    <span class="text-vd-silver">Modifié le</span>
-                    <span class="font-mono" style="font-size:0.8rem;">{{ article.updated_at|date:"d/m/Y" }}</span>
-                </div>
-                <div class="stat-row">
-                    <span class="text-vd-silver">Vues</span>
-                    <span class="text-vd-accent font-mono">{{ article.views_count }}</span>
-                </div>
-                <div class="stat-row">
-                    <span class="text-vd-silver">Statut</span>
-                    {% if article.is_verified %}
-                    <span class="badge-verified">Vérifié</span>
-                    {% else %}
-                    <span class="badge-unverified">En attente</span>
-                    {% endif %}
+                    <span class="text-vd-silver">الحالة</span>
+                    {% if article.is_verified %}<span class="badge-verified">محقق</span>{% else %}<span class="badge-unverified">قيد الانتظار</span>{% endif %}
                 </div>
             </div>
 
-            <!-- Fact check CTA -->
-            <div class="vd-card sidebar-card" style="border-color:rgba(37,99,235,0.4);background:rgba(37,99,235,0.06);">
-                <div class="vd-card-title mb-2"><i class="bi bi-shield-check me-2 text-vd-accent"></i>Vérification IA</div>
-                <p class="text-vd-silver" style="font-size:0.85rem;">Analysez cet article avec notre moteur IA pour obtenir un score de crédibilité.</p>
+            <div class="vd-card mb-3" style="border-color:rgba(37,99,235,0.4);background:rgba(37,99,235,0.06);">
+                <div class="vd-card-title mb-2"><i class="bi bi-shield-check me-2 text-vd-accent"></i>تحقق بالذكاء الاصطناعي</div>
+                <p class="text-vd-silver" style="font-size:0.88rem;font-family:var(--font-body);line-height:1.8;">حلل هذا المقال بمحركنا الذكي للحصول على نقاط مصداقية.</p>
                 <a href="/fact-check/" class="btn-vd-primary w-100 text-center" style="padding:0.55rem;">
-                    <i class="bi bi-robot me-2"></i>Analyser avec l'IA
+                    <i class="bi bi-robot me-2"></i>تحليل بالذكاء الاصطناعي
                 </a>
             </div>
 
-            <!-- Related articles -->
             {% if related %}
-            <div class="vd-card sidebar-card">
-                <div class="vd-card-title mb-3"><i class="bi bi-collection me-2 text-vd-accent"></i>Articles similaires</div>
+            <div class="vd-card">
+                <div class="vd-card-title mb-3"><i class="bi bi-collection me-2 text-vd-accent"></i>مقالات ذات صلة</div>
                 {% for rel in related %}
                 <a href="/news/{{ rel.pk }}/" style="text-decoration:none;color:inherit;">
                     <div style="padding:0.7rem 0;border-bottom:1px solid var(--vd-border);">
-                        <div style="font-family:var(--font-head);font-size:0.9rem;color:var(--vd-white);">{{ rel.title|truncatechars:60 }}</div>
-                        <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--vd-silver);margin-top:0.3rem;">
-                            {{ rel.created_at|date:"d M Y" }}
-                        </div>
+                        <div style="font-family:var(--font-main);font-size:0.92rem;color:var(--vd-white);line-height:1.5;">{{ rel.title|truncatechars:60 }}</div>
+                        <div style="font-family:var(--font-body);font-size:0.75rem;color:var(--vd-silver);margin-top:0.3rem;">{{ rel.created_at|date:"d M Y" }}</div>
                     </div>
                 </a>
                 {% endfor %}
