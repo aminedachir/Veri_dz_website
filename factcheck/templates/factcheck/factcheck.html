@@ -71,10 +71,10 @@
         <div class="col-lg-8">
             <div class="fc-input-panel">
                 <div class="fc-tabs">
-                    <button class="fc-tab active" onclick="switchTab('text', this)">
+                    <button class="fc-tab" id="tab-text" onclick="switchTab('text', this)">
                         <i class="bi bi-textarea-t me-1"></i>نص
                     </button>
-                    <button class="fc-tab" onclick="switchTab('url', this)">
+                    <button class="fc-tab" id="tab-url" onclick="switchTab('url', this)">
                         <i class="bi bi-link-45deg me-1"></i>رابط
                     </button>
                 </div>
@@ -99,7 +99,7 @@
                         <input type="url" name="url" id="fc-url" class="vd-form-control"
                                placeholder="https://…" value="{{ input_url }}">
                         <div class="char-count mt-2" style="text-align:right;color:rgba(192,200,224,0.5);font-family:var(--font-body);">
-                            <i class="bi bi-info-circle me-1"></i>سيقوم الذكاء الاصطناعي بتحليل عنوان ومحتوى الرابط.
+                            <i class="bi bi-info-circle me-1"></i>سيقوم الذكاء الاصطناعي بقراءة محتوى الرابط وتحليله.
                         </div>
                     </div>
 
@@ -132,22 +132,18 @@
                         </div>
                     </div>
                     <div class="col">
-                        <div style="font-family:var(--font-body);font-size:0.75rem;color:var(--vd-silver);margin-bottom:0.3rem;">الحكم</div>
                         <div class="verdict-title {{ result.verdict }}">
-                            {% if result.verdict == 'true' %}صحيح
-                            {% elif result.verdict == 'false' %}خاطئ
-                            {% elif result.verdict == 'misleading' %}مضلل
-                            {% elif result.verdict == 'partial' %}صحيح جزئياً
-                            {% else %}غير قابل للتحقق{% endif %}
+                            {% if result.verdict == 'true' %}✓ صحيح
+                            {% elif result.verdict == 'false' %}✗ خاطئ
+                            {% elif result.verdict == 'misleading' %}⚠ مضلل
+                            {% elif result.verdict == 'partial' %}≈ جزئي
+                            {% else %}؟ غير قابل للتحقق{% endif %}
                         </div>
-                        <div class="mt-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-family:var(--font-body);font-size:0.78rem;color:var(--vd-silver);">نقاط الثقة</span>
-                                <span style="font-family:var(--font-main);font-size:1.1rem;font-weight:800;color:var(--vd-white);">{{ result.confidence_pct }}%</span>
-                            </div>
-                            <div class="conf-bar-wrap">
-                                <div class="conf-bar {{ result.verdict }}" style="width:{{ result.confidence_pct }}%;"></div>
-                            </div>
+                        <div style="font-family:var(--font-body);font-size:0.85rem;color:var(--vd-silver);margin-top:0.5rem;">
+                            مستوى الثقة: <strong style="color:var(--vd-white);">{{ result.confidence_pct }}%</strong>
+                        </div>
+                        <div class="conf-bar-wrap">
+                            <div class="conf-bar {{ result.verdict }}" style="width:{{ result.confidence_pct }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -247,7 +243,9 @@
 
 {% block extra_js %}
 <script>
+// ── Tab switching ──────────────────────────────────────────────────
 let activeTab = 'text';
+
 function switchTab(tab, btn) {
     activeTab = tab;
     document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
@@ -255,22 +253,50 @@ function switchTab(tab, btn) {
     document.getElementById('text-panel').style.display = tab === 'text' ? 'block' : 'none';
     document.getElementById('url-panel').style.display  = tab === 'url'  ? 'block' : 'none';
 }
+
+// Bug #4 fix: Restore correct tab after POST round-trip
+(function restoreTab() {
+    const inputUrl  = "{{ input_url|escapejs }}";
+    const inputText = "{{ input_text|escapejs }}";
+    if (inputUrl && !inputText) {
+        // URL tab was active
+        switchTab('url', document.getElementById('tab-url'));
+    } else {
+        switchTab('text', document.getElementById('tab-text'));
+    }
+})();
+
+// ── Character counter ──────────────────────────────────────────────
 const textarea = document.getElementById('fc-text');
 const counter  = document.getElementById('char-count');
 if (textarea) {
     textarea.addEventListener('input', () => counter.textContent = textarea.value.length);
     counter.textContent = textarea.value.length;
 }
+
+// ── Clear form ─────────────────────────────────────────────────────
 function clearForm() {
     if (textarea) textarea.value = '';
     const urlInput = document.getElementById('fc-url');
     if (urlInput) urlInput.value = '';
     if (counter) counter.textContent = '0';
 }
+
+// ── Submit handling ────────────────────────────────────────────────
 function onSubmit() {
     document.getElementById('submit-btn').disabled = true;
     document.getElementById('submit-btn').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>جارٍ التحليل…';
     document.getElementById('spinner').style.display = 'flex';
 }
+
+// Bug #3 fix: Reset button when page is restored from cache (back button)
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-robot me-2"></i>تحليل بالذكاء الاصطناعي';
+        document.getElementById('spinner').style.display = 'none';
+    }
+});
 </script>
 {% endblock %}

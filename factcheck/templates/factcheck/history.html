@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Historique des vérifications — VeriDz{% endblock %}
+{% block title %}سجل التحققات — VeriDz{% endblock %}
 {% block nav_fact %}active{% endblock %}
 
 {% block extra_css %}
@@ -38,10 +38,10 @@
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--vd-bright);letter-spacing:2px;margin-bottom:0.5rem;">HISTORIQUE</div>
+        <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--vd-bright);letter-spacing:2px;margin-bottom:0.5rem;">السجل</div>
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <h1 class="vd-section-title mb-0">Vérifications <span class="accent">récentes</span></h1>
-            <a href="/fact-check/" class="btn-vd-primary"><i class="bi bi-plus-lg me-1"></i>Nouvelle vérification</a>
+            <h1 class="vd-section-title mb-0">التحققات <span class="accent">الأخيرة</span></h1>
+            <a href="/fact-check/" class="btn-vd-primary"><i class="bi bi-plus-lg me-1"></i>تحقق جديد</a>
         </div>
     </div>
 
@@ -49,11 +49,11 @@
     {% for check in checks %}
     <div class="hist-row">
         <div class="hist-verdict-badge hv-{{ check.verdict }}">
-            {% if check.verdict == 'true' %}✓ VRAI
-            {% elif check.verdict == 'false' %}✗ FAUX
-            {% elif check.verdict == 'misleading' %}⚠ TROMPEUR
-            {% elif check.verdict == 'partial' %}≈ PARTIEL
-            {% else %}? N/V{% endif %}
+            {% if check.verdict == 'true' %}✓ صحيح
+            {% elif check.verdict == 'false' %}✗ خاطئ
+            {% elif check.verdict == 'misleading' %}⚠ مضلل
+            {% elif check.verdict == 'partial' %}≈ جزئي
+            {% else %}؟ غ.م{% endif %}
         </div>
         <div class="flex-grow-1">
             <div style="font-size:0.92rem;color:var(--vd-white);margin-bottom:0.4rem;">
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="text-end flex-shrink-0" style="min-width:80px;">
-            <div class="conf-mini">{{ check.confidence_pct }}% confiance</div>
+            <div class="conf-mini">{{ check.confidence_pct }}% ثقة</div>
             <div class="conf-mini mt-1">{{ check.created_at|date:"d/m/Y H:i" }}</div>
             {% if check.user %}<div class="conf-mini mt-1" style="color:var(--vd-bright);">{{ check.user.username }}</div>{% endif %}
         </div>
@@ -73,8 +73,8 @@
     {% else %}
     <div class="text-center py-5">
         <i class="bi bi-clock-history" style="font-size:3rem;color:rgba(59,130,246,0.3);"></i>
-        <p class="text-vd-silver mt-3">Aucune vérification effectuée pour le moment.</p>
-        <a href="/fact-check/" class="btn-vd-primary mt-2">Commencer à vérifier</a>
+        <p class="text-vd-silver mt-3">لا توجد تحققات حتى الآن.</p>
+        <a href="/fact-check/" class="btn-vd-primary mt-2">ابدأ التحقق</a>
     </div>
     {% endif %}
 </div>
