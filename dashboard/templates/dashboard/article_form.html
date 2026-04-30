@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}{{ action }} un article — VeriDz{% endblock %}
+{% block title %}{{ action }} مقال — VeriDz{% endblock %}
 {% block nav_dash %}active{% endblock %}
 
 {% block extra_css %}
 <style>
+/* RTL Support */
+html, body { direction: rtl; }
+
 .form-page { padding: 2.5rem 0; }
 .form-card {
     background: var(--vd-card-bg);
@@ -23,6 +26,8 @@ input[type=text], input[type=url], textarea, select {
     padding: 0.65rem 1rem !important;
     width: 100% !important;
     transition: border-color 0.2s, box-shadow 0.2s !important;
+    text-align: right !important;
+    direction: rtl !important;
 }
 input[type=text]:focus, input[type=url]:focus, textarea:focus, select:focus {
     outline: none !important;
@@ -31,6 +36,11 @@ input[type=text]:focus, input[type=url]:focus, textarea:focus, select:focus {
     background: rgba(10,15,46,0.9) !important;
 }
 select option { background: #0a0f2e; color: var(--vd-white); }
+
+/* RTL icon spacing fixes */
+.bi { margin-left: 0.25rem; margin-right: 0; }
+.me-1, .me-2 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+.ms-1 { margin-right: 0.25rem !important; margin-left: 0 !important; }
 </style>
 {% endblock %}
 
@@ -38,15 +48,15 @@ select option { background: #0a0f2e; color: var(--vd-white); }
 <div class="container form-page">
     <div class="d-flex align-items-center gap-3 mb-3">
         <a href="/dashboard/" class="text-vd-silver" style="text-decoration:none;">
-            <i class="bi bi-arrow-left me-1"></i>Dashboard
+            <i class="bi bi-arrow-right me-1"></i>لوحة التحكم
         </a>
         <span class="text-vd-silver">/</span>
-        <span class="text-vd-accent font-mono" style="font-size:0.85rem;">{{ action }} article</span>
+        <span class="text-vd-accent font-mono" style="font-size:0.85rem;">{{ action }} مقال</span>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            <div class="vd-section-title mb-1">{{ action }} un <span class="accent">Article</span></div>
+            <div class="vd-section-title mb-1">{{ action }} <span class="accent">مقال</span></div>
             <hr class="vd-divider">
 
             <div class="form-card">
@@ -76,15 +86,15 @@ select option { background: #0a0f2e; color: var(--vd-white); }
 
                     <div class="vd-alert vd-alert-info mt-2 mb-3">
                         <i class="bi bi-info-circle me-2"></i>
-                        Votre article sera soumis à vérification avant publication. Un administrateur examinera le contenu.
+                        سيتم إرسال مقالك للمراجعة قبل النشر. سيقوم أحد المشرفين بفحص المحتوى.
                     </div>
 
                     <div class="d-flex gap-2 flex-wrap">
                         <button type="submit" class="btn-vd-primary" style="padding:0.65rem 2rem;">
-                            <i class="bi bi-send me-2"></i>{{ action }} l'article
+                            <i class="bi bi-send me-2"></i>{{ action }} المقال
                         </button>
                         <a href="/dashboard/" class="btn-vd-outline" style="padding:0.65rem 1.2rem;">
-                            <i class="bi bi-x-lg me-1"></i>Annuler
+                            <i class="bi bi-x-lg me-1"></i>إلغاء
                         </a>
                     </div>
                 </form>

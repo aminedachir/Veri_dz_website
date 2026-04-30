@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}فيري دي زد — منصة التحقق من الأخبار{% endblock %}</title>
+    <title>{% block title %}Veri_DZ — منصة التحقق من الأخبار{% endblock %}</title>
     {% load static %}
     <link rel="icon" type="image/jpeg" href="{% static 'images/logo.jpeg' %}">
 
@@ -29,6 +29,7 @@
             --vd-panel:      rgba(26,58,143,0.12);
             --font-main:     'Cairo', sans-serif;
             --font-body:     'Tajawal', sans-serif;
+            --sidebar-width: 280px;
         }
 
         * { box-sizing: border-box; }
@@ -56,7 +57,7 @@
 
         body > * { position: relative; z-index: 1; }
 
-        /* ─── Navbar ─── */
+        /* ========== شريط التنقل العادي (Desktop) ========== */
         .vd-navbar {
             background: rgba(6,12,31,0.92);
             border-bottom: 1px solid var(--vd-border);
@@ -90,6 +91,175 @@
 
         .vd-navbar .brand-text span { color: var(--vd-bright); }
 
+        /* إخفاء القائمة العادية على الموبايل */
+        @media (max-width: 991px) {
+            .desktop-nav-links {
+                display: none !important;
+            }
+            
+            /* زر فتح القائمة الجانبية */
+            .menu-toggle-btn {
+                display: flex !important;
+                background: rgba(59,130,246,0.15);
+                border: 1px solid var(--vd-border);
+                border-radius: 8px;
+                padding: 0.5rem 0.8rem;
+                color: var(--vd-bright);
+                font-size: 1.3rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .menu-toggle-btn:hover {
+                background: rgba(59,130,246,0.3);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .menu-toggle-btn, .sidebar-overlay, .mobile-sidebar {
+                display: none !important;
+            }
+            .desktop-nav-links {
+                display: flex !important;
+            }
+        }
+
+        /* زر القائمة على الموبايل */
+        .menu-toggle-btn {
+            display: none;
+        }
+
+        /* ========== القائمة الجانبية للموبايل ========== */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: var(--sidebar-width);
+            height: 100%;
+            background: rgba(6, 12, 31, 0.98);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--vd-border);
+            z-index: 9999;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .mobile-sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--vd-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header .brand-text {
+            font-family: var(--font-main);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--vd-white);
+        }
+
+        .sidebar-header .brand-text span {
+            color: var(--vd-bright);
+        }
+
+        .close-sidebar {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f87171;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .close-sidebar:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem;
+        }
+
+        .sidebar-nav .nav-item {
+            list-style: none;
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--vd-silver);
+            text-decoration: none;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav .nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+        }
+
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--vd-bright);
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--vd-border);
+        }
+
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--vd-border);
+        }
+
+        /* منع التمرير عند فتح القائمة */
+        body.sidebar-open {
+            overflow: hidden;
+        }
+
+        /* ========== باقي الأنماط الأصلية ========== */
         .vd-navbar .nav-link {
             font-family: var(--font-main);
             font-size: 0.98rem;
@@ -108,7 +278,7 @@
 
         .vd-navbar .nav-link i { margin-left: 5px; margin-right: 0; }
 
-        /* ─── Buttons ─── */
+        /* Buttons */
         .btn-vd-primary {
             background: linear-gradient(135deg, var(--vd-accent), var(--vd-blue));
             color: #fff;
@@ -165,7 +335,7 @@
         }
         .btn-vd-danger:hover { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; }
 
-        /* ─── Cards ─── */
+        /* Cards */
         .vd-card {
             background: var(--vd-card-bg);
             border: 1px solid var(--vd-border);
@@ -186,7 +356,7 @@
             color: var(--vd-white);
         }
 
-        /* ─── Section headings ─── */
+        /* Section headings */
         .vd-section-title {
             font-family: var(--font-main);
             font-weight: 800;
@@ -203,7 +373,7 @@
             width: 60px;
         }
 
-        /* ─── Badges ─── */
+        /* Badges */
         .badge-verified {
             background: rgba(16,185,129,0.15);
             color: #34d399;
@@ -232,7 +402,7 @@
             border-radius: 3px;
         }
 
-        /* ─── Alerts ─── */
+        /* Alerts */
         .vd-alert {
             border-radius: 6px;
             border-right: 3px solid;
@@ -246,7 +416,7 @@
         .vd-alert-info    { background: rgba(59,130,246,0.1); border-color: var(--vd-bright); color: var(--vd-glow); }
         .vd-alert-error   { background: rgba(239,68,68,0.1);  border-color: #ef4444; color: #f87171; }
 
-        /* ─── Forms ─── */
+        /* Forms */
         .vd-form-control {
             background: rgba(10,15,46,0.7);
             border: 1px solid var(--vd-border);
@@ -274,7 +444,7 @@
             display: block;
         }
 
-        /* ─── Footer ─── */
+        /* Footer */
         .vd-footer {
             background: rgba(6,12,31,0.95);
             border-top: 1px solid var(--vd-border);
@@ -292,7 +462,7 @@
         .vd-footer a { color: var(--vd-silver); text-decoration: none; transition: color 0.2s; }
         .vd-footer a:hover { color: var(--vd-bright); }
 
-        /* ─── Scanline ─── */
+        /* Scanline */
         @keyframes scanline {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(100vh); }
@@ -307,7 +477,7 @@
             z-index: 9999;
         }
 
-        /* ─── Utility ─── */
+        /* Utility */
         .text-vd-accent { color: var(--vd-bright); }
         .text-vd-silver { color: var(--vd-silver); }
         .font-main { font-family: var(--font-main); }
@@ -367,8 +537,74 @@
 </div>
 {% endif %}
 
-<!-- شريط التنقل -->
-{% load static %}
+<!-- ========== القائمة الجانبية للموبايل ========== -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <span class="brand-text">Veri<span>_DZ </span></span>
+        <div class="close-sidebar" id="closeSidebar">
+            <i class="bi bi-x-lg"></i>
+        </div>
+    </div>
+    
+    <ul class="sidebar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="/">
+            <i class="bi bi-house"></i> الرئيسية
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/news/">
+            <i class="bi bi-newspaper"></i> الأخبار
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/fact-check/">
+            <i class="bi bi-shield-check"></i> التحقق
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/publications/">
+            <i class="bi bi-shield-check"></i> المنشورات
+        </a>
+    </li>
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link" href="/dashboard/">
+            <i class="bi bi-speedometer2"></i> لوحة التحكم
+        </a>
+    </li>
+    {% endif %}
+</ul>
+    
+    <div class="sidebar-footer">
+        {% if user.is_authenticated %}
+            <div class="user-info">
+                <i class="bi bi-person-circle" style="font-size: 1.8rem; color: var(--vd-bright);"></i>
+                <div>
+                    <div style="font-weight: bold;">{{ user.username }}</div>
+                    <div style="font-size: 0.75rem; color: var(--vd-silver);">
+                        {% if user.is_staff %}مدير
+                        {% elif user.is_journalist %}صحفي
+                        {% else %}قارئ{% endif %}
+                    </div>
+                </div>
+            </div>
+            <a href="/accounts/logout/" class="btn-vd-outline" style="width: 100%; text-align: center; padding: 0.5rem;">
+                <i class="bi bi-box-arrow-right"></i> خروج
+            </a>
+        {% else %}
+            <a href="/accounts/login/" class="btn-vd-outline" style="width: 100%; text-align: center; margin-bottom: 0.5rem;">
+                <i class="bi bi-box-arrow-in-left"></i> دخول
+            </a>
+            <a href="/accounts/signup/" class="btn-vd-primary" style="width: 100%; text-align: center;">
+                <i class="bi bi-person-plus"></i> تسجيل
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- شريط التنقل الرئيسي -->
 <nav class="vd-navbar navbar navbar-expand-lg sticky-top">
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -376,11 +612,13 @@
             <span class="brand-text">Veri<span>_DZ </span></span>
         </a>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" style="color:var(--vd-bright)">
-            <i class="bi bi-list fs-4"></i>
-        </button>
+        <!-- زر فتح القائمة الجانبية (يظهر فقط على الموبايل) -->
+        <div class="menu-toggle-btn" id="menuToggle">
+            <i class="bi bi-list"></i>
+        </div>
 
-        <div class="collapse navbar-collapse" id="navMenu">
+        <!-- روابط سطح المكتب -->
+        <div class="desktop-nav-links collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav mx-auto gap-1">
                 <li class="nav-item">
                     <a class="nav-link {% block nav_home %}{% endblock %}" href="/"><i class="bi bi-house me-1"></i>الرئيسية</a>
@@ -390,6 +628,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% block nav_fact %}{% endblock %}" href="/fact-check/"><i class="bi bi-shield-check me-1"></i>التحقق</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% block nav_pubs %}{% endblock %}" href="/publications/"><i class="bi bi-journal-text me-1"></i>المنشورات</a>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -437,6 +678,7 @@
                     <li><a href="/">الرئيسية</a></li>
                     <li><a href="/news/">الأخبار</a></li>
                     <li><a href="/fact-check/">التحقق</a></li>
+                    <li><a href="/publications/">المنشورات</a></li>
                 </ul>
             </div>
             <div class="col-md-2">
@@ -445,6 +687,7 @@
                     <li><a href="/accounts/login/">دخول</a></li>
                     <li><a href="/accounts/signup/">تسجيل</a></li>
                     <li><a href="/dashboard/">لوحة التحكم</a></li>
+                    <li><a href="/publications/">المنشورات</a></li>
                 </ul>
             </div>
             <div class="col-md-2">
@@ -465,6 +708,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // ظهور وإخفاء القائمة الجانبية
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('closeSidebar');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.classList.add('sidebar-open');
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+    }
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', openSidebar);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+    
+    // إغلاق القائمة عند الضغط على رابط داخلها
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+        link.addEventListener('click', closeSidebar);
+    });
+    
+    // رسائل النظام تختفي تلقائياً
     setTimeout(() => {
         document.querySelectorAll('.vd-toast').forEach(el => {
             el.style.transition = 'opacity 0.5s';

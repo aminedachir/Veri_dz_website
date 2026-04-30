@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from news.models import Article
 from factcheck.models import FactCheckResult
+from publications.models import Publication
 from .forms import ArticleForm
 
 
@@ -13,16 +14,24 @@ def dashboard_home(request):
     my_checks = FactCheckResult.objects.filter(user=user).order_by('-created_at')[:5]
 
     stats = {
-        'total': my_articles.count(),
+        'total':    my_articles.count(),
         'verified': my_articles.filter(is_verified=True).count(),
-        'pending': my_articles.filter(is_verified=False).count(),
-        'views': sum(a.views_count for a in my_articles),
-        'checks': FactCheckResult.objects.filter(user=user).count(),
+        'pending':  my_articles.filter(is_verified=False).count(),
+        'views':    sum(a.views_count for a in my_articles),
+        'checks':   FactCheckResult.objects.filter(user=user).count(),
     }
+
+    # Admin: load publications data for dashboard widget
+    recent_publications = None
+    if user.is_staff:
+        recent_publications = Publication.objects.order_by('-created_at')[:4]
+        stats['publications'] = Publication.objects.count()
+
     context = {
-        'articles': my_articles[:8],
-        'recent_checks': my_checks,
-        'stats': stats,
+        'articles':            my_articles[:8],
+        'recent_checks':       my_checks,
+        'stats':               stats,
+        'recent_publications': recent_publications,
     }
     return render(request, 'dashboard/dashboard.html', context)
 

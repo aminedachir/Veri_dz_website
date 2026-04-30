@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block title %}{% if pub %}تعديل المنشور{% else %}منشور جديد{% endif %} — VeriDz{% endblock %}
+
+{% block extra_css %}
+<style>
+html, body { direction: rtl; }
+
+.form-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--vd-border);
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--vd-silver);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.form-control-vd {
+    width: 100%;
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    color: var(--vd-white);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+    outline: none;
+}
+.form-control-vd:focus { border-color: #a78bfa; }
+.form-control-vd::placeholder { color: var(--vd-silver); opacity: 0.5; }
+
+textarea.form-control-vd { min-height: 120px; resize: vertical; }
+
+/* TYPE SELECTOR */
+.type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.type-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.type-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+}
+
+.type-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+    border: 1px dashed var(--vd-border);
+    background: var(--vd-card-bg);
+    color: var(--vd-silver);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.type-label i { font-size: 1.8rem; }
+
+.type-option input[type="radio"]:checked + .type-label {
+    border-color: #a78bfa;
+    background: rgba(139,92,246,0.1);
+    color: #a78bfa;
+}
+
+.type-option.video-opt input[type="radio"]:checked + .type-label {
+    border-color: #f87171;
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+}
+
+/* UPLOAD ZONE */
+.upload-zone {
+    border: 2px dashed var(--vd-border);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: var(--vd-card-bg);
+    cursor: pointer;
+    transition: all 0.22s;
+    position: relative;
+}
+.upload-zone:hover { border-color: #a78bfa; background: rgba(139,92,246,0.05); }
+.upload-zone.drag-over { border-color: #a78bfa; background: rgba(139,92,246,0.1); }
+.upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+.upload-zone i { font-size: 2rem; color: rgba(139,92,246,0.4); display: block; margin-bottom: 0.5rem; }
+.upload-zone p { color: var(--vd-silver); font-size: 0.85rem; margin: 0; }
+.upload-zone small { color: rgba(139,92,246,0.6); font-family: var(--font-mono); font-size: 0.72rem; }
+
+/* PREVIEW */
+#preview-wrap { display: none; margin-top: 1rem; }
+#preview-wrap img, #preview-wrap video {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 6px;
+    border: 1px solid var(--vd-border);
+    object-fit: contain;
+}
+
+.field-group { margin-bottom: 1.25rem; }
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--vd-border);
+    margin-top: 1.5rem;
+}
+
+.alert-vd {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    color: #f87171;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-header">
+        <a href="/dashboard/" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--vd-silver);text-decoration:none;">
+            ← العودة للوحة التحكم
+        </a>
+        <div style="font-family:var(--font-mono);font-size:0.72rem;color:#a78bfa;letter-spacing:2px;margin:0.75rem 0 0.3rem;">
+            <i class="bi bi-shield-fill me-1"></i>صلاحيات المشرف
+        </div>
+        <h1 class="vd-section-title mb-0">
+            {% if pub %}تعديل المنشور{% else %}منشور <span class="accent">جديد</span>{% endif %}
+        </h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="vd-card">
+
+                {% if form.errors %}
+                <div class="alert-vd">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    يرجى تصحيح الأخطاء أدناه.
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" id="pubForm">
+                    {% csrf_token %}
+
+                    <!-- TYPE SELECTOR -->
+                    {% if not pub %}
+                    <div class="field-group">
+                        <label class="form-label">نوع المنشور</label>
+                        <div class="type-selector">
+                            <div class="type-option">
+                                <input type="radio" name="pub_type" id="type_image" value="image"
+                                    {% if request.GET.type == 'image' or not request.GET.type %}checked{% endif %}>
+                                <label class="type-label" for="type_image">
+                                    <i class="bi bi-image-fill"></i>
+                                    صورة
+                                </label>
+                            </div>
+                            <div class="type-option video-opt">
+                                <input type="radio" name="pub_type" id="type_video" value="video"
+                                    {% if request.GET.type == 'video' %}checked{% endif %}>
+                                <label class="type-label" for="type_video">
+                                    <i class="bi bi-camera-video-fill"></i>
+                                    فيديو
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="pub_type" value="{{ pub.pub_type }}">
+                    {% endif %}
+
+                    <!-- TITLE -->
+                    <div class="field-group">
+                        <label class="form-label" for="id_title">العنوان *</label>
+                        <input type="text" name="title" id="id_title"
+                            class="form-control-vd"
+                            value="{{ pub.title|default:'' }}"
+                            placeholder="أدخل عنوان المنشور..."
+                            required>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="field-group">
+                        <label class="form-label" for="id_description">الوصف</label>
+                        <textarea name="description" id="id_description"
+                            class="form-control-vd"
+                            placeholder="وصف اختياري للمحتوى...">{{ pub.description|default:'' }}</textarea>
+                    </div>
+
+                    <!-- FILE UPLOAD -->
+                    <div class="field-group" id="imageField"
+                        style="{% if request.GET.type == 'video' %}display:none;{% endif %}">
+                        <label class="form-label">
+                            {% if pub and pub.pub_type == 'video' %}صورة مصغرة (اختياري){% else %}الصورة *{% endif %}
+                        </label>
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" name="image" id="imageInput"
+                                accept="image/*"
+                                onchange="previewFile(this, 'image')">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <p>اسحب وأفلت الصورة هنا أو انقر للاختيار</p>
+                            <small>PNG, JPG, WEBP — حتى 10MB</small>
+                        </div>
+                        <div id="preview-wrap">
+                            <img id="imagePreview" src="" alt="معاينة">
+                        </div>
+                        {% if pub and pub.image %}
+                        <p style="font-size:0.78rem;color:var(--vd-silver);margin-top:0.5rem;">
+                            <i class="bi bi-check-circle me-1" style="color:#34d399;"></i>
+                            صورة حالية: {{ pub.image.name }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="field-group" id="videoField"
+                        style="{% if request.GET.type != 'video' and not pub.pub_type == 'video' %}display:none;{% endif %}">
+                        <label class="form-label">ملف الفيديو *</label>
+                        <div class="upload-zone" id="videoZone">
+                            <input type="file" name="video" id="videoInput"
+                                accept="video/*"
+                                onchange="previewFile(this, 'video')">
+                            <i class="bi bi-film"></i>
+                            <p>اسحب وأفلت الفيديو هنا أو انقر للاختيار</p>
+                            <small>MP4, WEBM, MOV — حتى 500MB</small>
+                        </div>
+                        <div id="video-preview-wrap" style="display:none;margin-top:1rem;">
+                            <video id="videoPreview" controls style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--vd-border);"></video>
+                        </div>
+                        {% if pub and pub.video %}
+                        <p style="font-size:0.78rem;color:var(--vd-silver);margin-top:0.5rem;">
+                            <i class="bi bi-check-circle me-1" style="color:#34d399;"></i>
+                            فيديو حالي: {{ pub.video.name }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Thumbnail for video -->
+                        <div style="margin-top:1rem;">
+                            <label class="form-label">صورة مصغرة للفيديو (اختياري)</label>
+                            <div class="upload-zone">
+                                <input type="file" name="thumbnail" accept="image/*"
+                                    onchange="previewThumb(this)">
+                                <i class="bi bi-image"></i>
+                                <p>اختر صورة مصغرة للفيديو</p>
+                                <small>PNG, JPG — حتى 5MB</small>
+                            </div>
+                            <div id="thumb-preview-wrap" style="display:none;margin-top:0.75rem;">
+                                <img id="thumbPreview" src="" style="max-height:100px;border-radius:5px;border:1px solid var(--vd-border);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PUBLISHED TOGGLE -->
+                    <div class="field-group" style="display:flex;align-items:center;gap:0.75rem;">
+                        <input type="checkbox" name="is_published" id="is_published"
+                            {% if pub.is_published or not pub %}checked{% endif %}
+                            style="width:16px;height:16px;accent-color:#a78bfa;cursor:pointer;">
+                        <label for="is_published" class="form-label" style="margin:0;cursor:pointer;">
+                            نشر فوراً (إلغاء التحديد للحفظ كمسودة)
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/dashboard/" class="btn-vd-outline">إلغاء</a>
+                        <button type="submit" class="btn-vd-primary">
+                            <i class="bi bi-cloud-upload me-1"></i>
+                            {% if pub %}حفظ التعديلات{% else %}نشر المحتوى{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Switch upload fields based on type selection
+document.querySelectorAll('input[name="pub_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const isVideo = this.value === 'video';
+        document.getElementById('imageField').style.display = isVideo ? 'none' : 'block';
+        document.getElementById('videoField').style.display = isVideo ? 'block' : 'none';
+    });
+});
+
+// Preview image
+function previewFile(input, type) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    if (type === 'image') {
+        const wrap = document.getElementById('preview-wrap');
+        const img = document.getElementById('imagePreview');
+        img.src = url;
+        wrap.style.display = 'block';
+    } else {
+        const wrap = document.getElementById('video-preview-wrap');
+        const vid = document.getElementById('videoPreview');
+        vid.src = url;
+        wrap.style.display = 'block';
+    }
+}
+
+function previewThumb(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    document.getElementById('thumbPreview').src = url;
+    document.getElementById('thumb-preview-wrap').style.display = 'block';
+}
+
+// Drag and drop highlight
+document.querySelectorAll('.upload-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); });
+});
+</script>
+{% endblock %}

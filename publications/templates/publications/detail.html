@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block title %}{{ publication.title }} — VeriDz{% endblock %}
+
+{% block extra_css %}
+<style>
+html, body { direction: rtl; }
+
+.pub-detail-wrap { max-width: 820px; margin: 0 auto; padding: 2rem 0 5rem; }
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--vd-silver);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+}
+.back-link:hover { color: #a78bfa; }
+
+.pub-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.meta-pill {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.22rem 0.65rem;
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+}
+.meta-pill.image { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+.meta-pill.video { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+.meta-date { color: var(--vd-silver); font-family: var(--font-mono); font-size: 0.78rem; }
+.meta-views { color: var(--vd-silver); font-family: var(--font-mono); font-size: 0.78rem; display: flex; align-items: center; gap: 4px; }
+
+.pub-detail-title {
+    font-family: var(--font-head);
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--vd-white);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.media-frame {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--vd-border);
+    margin-bottom: 1.5rem;
+    background: var(--vd-card-bg);
+}
+.media-frame img { width: 100%; max-height: 520px; object-fit: contain; display: block; background: #000; }
+.media-frame video { width: 100%; max-height: 520px; display: block; background: #000; }
+
+.pub-desc-card {
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--vd-white);
+}
+.pub-desc-card .desc-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    color: var(--vd-silver);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+}
+
+.author-strip {
+    background: var(--vd-card-bg);
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 8px;
+    padding: 1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+}
+.author-left { display: flex; align-items: center; gap: 0.9rem; }
+.author-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; color: white;
+    flex-shrink: 0;
+}
+.author-info small { font-family: var(--font-mono); font-size: 0.68rem; color: var(--vd-silver); display: block; }
+.author-info strong { font-size: 0.9rem; color: var(--vd-white); }
+
+.admin-actions { display: flex; gap: 0.5rem; }
+.btn-sm-vd {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--vd-border);
+    color: var(--vd-silver);
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-sm-vd:hover { border-color: var(--vd-bright); color: var(--vd-bright); }
+.btn-sm-vd.del { border-color: rgba(239,68,68,0.3); color: #f87171; }
+.btn-sm-vd.del:hover { background: rgba(239,68,68,0.1); }
+
+@media (max-width: 600px) {
+    .pub-detail-title { font-size: 1.4rem; }
+    .author-strip { flex-direction: column; align-items: flex-start; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="pub-detail-wrap">
+
+    <a href="/publications/" class="back-link">
+        <i class="bi bi-arrow-right"></i> العودة للمنشورات
+    </a>
+
+    <div class="pub-meta-row">
+        <span class="meta-pill {{ publication.pub_type }}">
+            {% if publication.pub_type == 'image' %}
+                <i class="bi bi-image me-1"></i>صورة
+            {% else %}
+                <i class="bi bi-camera-video me-1"></i>فيديو
+            {% endif %}
+        </span>
+        <span class="meta-date">{{ publication.created_at|date:"d F Y" }}</span>
+        <span class="meta-views">
+            <i class="bi bi-eye" style="font-size:0.75rem;"></i>
+            {{ publication.views_count }} مشاهدة
+        </span>
+    </div>
+
+    <h1 class="pub-detail-title">{{ publication.title }}</h1>
+
+    <div class="media-frame">
+        {% if publication.pub_type == 'image' and publication.image %}
+            <img src="{{ publication.image.url }}" alt="{{ publication.title }}">
+        {% elif publication.pub_type == 'video' and publication.video %}
+            <video controls preload="metadata" poster="{% if publication.thumbnail %}{{ publication.thumbnail.url }}{% endif %}">
+                <source src="{{ publication.video.url }}">
+                متصفحك لا يدعم تشغيل الفيديو.
+            </video>
+        {% endif %}
+    </div>
+
+    {% if publication.description %}
+    <div class="pub-desc-card">
+        <div class="desc-label">حول هذا المنشور</div>
+        {{ publication.description }}
+    </div>
+    {% endif %}
+
+    <div class="author-strip">
+        <div class="author-left">
+            <div class="author-avatar">{{ publication.author.username|first|upper }}</div>
+            <div class="author-info">
+                <small>نُشر بواسطة</small>
+                <strong>{{ publication.author.get_full_name|default:publication.author.username }}</strong>
+            </div>
+        </div>
+        {% if user.is_staff %}
+        <div class="admin-actions">
+            <a href="/publications/{{ publication.pk }}/edit/" class="btn-sm-vd">
+                <i class="bi bi-pencil me-1"></i>تعديل
+            </a>
+            <form method="post" action="/publications/{{ publication.pk }}/delete/" style="display:inline;"
+                  onsubmit="return confirm('هل تريد حذف هذا المنشور نهائياً؟')">
+                {% csrf_token %}
+                <button type="submit" class="btn-sm-vd del">
+                    <i class="bi bi-trash me-1"></i>حذف
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+{% endblock %}

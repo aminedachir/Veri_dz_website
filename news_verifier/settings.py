@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'factcheck',
     'accounts',
     'dashboard',
+    'publications',
 ]
 
 MIDDLEWARE = [
