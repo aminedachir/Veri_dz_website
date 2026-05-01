@@ -1,76 +1,415 @@
 {% extends "admin/index.html" %}
 {% load i18n static %}
 
-{% block content %}
-<div style="margin-bottom:2rem;">
-  <div style="font-family:'Space Grotesk',sans-serif;font-size:0.72rem;color:#6c63ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.4rem;">
-    لوحة التحكم
-  </div>
-  <h1 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:#e8e8f0;margin:0;">
-    مرحباً، <span style="color:#6c63ff;">{{ user.username }}</span>
-  </h1>
-  <p style="color:#6b6b80;font-size:0.88rem;margin-top:0.3rem;">
-    {% now "l، d F Y" %} — VeriDz Admin Panel
-  </p>
-</div>
-
-<!-- QUICK STATS -->
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;">
-  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
-    <div style="font-size:1.8rem;margin-bottom:0.3rem;">📰</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#e8e8f0;">
-      {{ app_list|length }}
-    </div>
-    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">تطبيقات نشطة</div>
-  </div>
-  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
-    <div style="font-size:1.8rem;margin-bottom:0.3rem;">✅</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#00d48a;">نشط</div>
-    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">حالة النظام</div>
-  </div>
-  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
-    <div style="font-size:1.8rem;margin-bottom:0.3rem;">🛡️</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#a78bfa;">
-      {% if user.is_superuser %}مدير{% else %}مشرف{% endif %}
-    </div>
-    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">صلاحيتك</div>
-  </div>
-  <div style="background:#12121a;border:1px solid rgba(108,99,255,0.2);border-radius:10px;padding:1.2rem;text-align:center;border-style:dashed;">
-    <div style="font-size:1.8rem;margin-bottom:0.3rem;">🌐</div>
-    <a href="/" style="font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;color:#6c63ff;text-decoration:none;">عرض الموقع</a>
-    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;margin-top:0.2rem;">الواجهة الأمامية</div>
-  </div>
-</div>
-
-<!-- QUICK ACTIONS -->
-<div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.25rem;margin-bottom:2rem;">
-  <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1rem;">
-    ⚡ إجراءات سريعة
-  </div>
-  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-    <a href="/admin/publications/publication/add/"
-       style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:#a78bfa;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;transition:all 0.2s;">
-      📸 نشر صورة / فيديو
-    </a>
-    <a href="/admin/news/article/add/"
-       style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:#60a5fa;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
-      📝 إضافة مقال
-    </a>
-    <a href="/admin/accounts/user/"
-       style="background:rgba(0,212,138,0.1);border:1px solid rgba(0,212,138,0.25);color:#00d48a;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
-      👥 إدارة المستخدمين
-    </a>
-    <a href="/admin/factcheck/factcheckresult/"
-       style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
-      🔍 نتائج التحقق
-    </a>
-    <a href="/publications/"
-       style="background:rgba(255,101,132,0.1);border:1px solid rgba(255,101,132,0.25);color:#ff6584;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
-      🖼 صفحة المنشورات
-    </a>
-  </div>
-</div>
-
-<!-- APP LIST -->
+{% block extrastyle %}
 {{ block.super }}
+<style>
+  /* ========== GLOBAL DASHBOARD RESET & RTL ========== */
+  :root {
+    --navy-deep:    #050d1a;
+    --navy:         #071428;
+    --navy-mid:     #0a1f3d;
+    --navy-light:   #0d2a52;
+    --blue-electric:#1a6bff;
+    --blue-bright:  #2979ff;
+    --blue-glow:    #4d9fff;
+    --blue-neon:    #00d4ff;
+    --silver:       #b0c4de;
+    --silver-bright:#d0e4f8;
+    --white:        #f0f8ff;
+    --border:       rgba(26,107,255,0.2);
+    --border-bright:rgba(26,107,255,0.5);
+    --glow-sm:      0 0 10px rgba(26,107,255,0.3);
+    --glow-md:      0 0 20px rgba(26,107,255,0.4), 0 0 40px rgba(26,107,255,0.15);
+    --danger:       #ff4d6a;
+    --success:      #00e5a0;
+    --warning:      #ffb800;
+    --purple:       #8b5cf6;
+    --purple-glow:  #a78bfa;
+  }
+
+  /* CRITICAL FIX: Override Django admin default container widths */
+  #container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #content {
+    margin: 0 !important;
+    padding: 1.75rem 2rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .dashboard #content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* MAIN LAYOUT - SIDEBAR + CONTENT (real dashboard) */
+  .dashboard-container {
+    display: flex;
+    gap: 1.75rem;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+  }
+
+  /* SIDEBAR STYLES - elegant, dark, glassmorphic */
+  .vd-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(26,107,255,0.2);
+    border-radius: 20px;
+    padding: 1.25rem 0.8rem;
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+  }
+
+  .vd-sidebar::-webkit-scrollbar { width: 3px; }
+  .vd-sidebar::-webkit-scrollbar-track { background: var(--navy-deep); border-radius: 10px; }
+  .vd-sidebar::-webkit-scrollbar-thumb { background: var(--blue-electric); border-radius: 10px; }
+
+  .sidebar-header {
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(26,107,255,0.25);
+    text-align: center;
+  }
+  .sidebar-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--blue-neon);
+    margin: 0 0 6px 0;
+  }
+  .sidebar-header p {
+    font-size: 0.7rem;
+    color: var(--silver);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .sidebar-section {
+    margin-bottom: 1.8rem;
+  }
+  .sidebar-section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--blue-glow);
+    margin-bottom: 0.8rem;
+    padding-right: 0.5rem;
+    border-right: 2px solid var(--blue-electric);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sidebar-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.55rem 0.9rem;
+    background: rgba(7,20,40,0.6);
+    border: 1px solid rgba(26,107,255,0.15);
+    border-radius: 12px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--silver-bright);
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+  }
+  .sidebar-btn i, .sidebar-btn .emoji-icon {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  .sidebar-btn:hover {
+    background: rgba(26,107,255,0.15);
+    border-color: var(--blue-electric);
+    transform: translateX(-4px) scale(1.01);
+    color: var(--blue-neon) !important;
+    box-shadow: var(--glow-sm);
+  }
+  .sidebar-btn.danger:hover {
+    border-color: var(--danger);
+    background: rgba(255,77,106,0.12);
+    color: var(--danger) !important;
+  }
+  .sidebar-btn.warning:hover {
+    border-color: var(--warning);
+    background: rgba(255,184,0,0.1);
+    color: var(--warning) !important;
+  }
+  .sidebar-btn.success:hover {
+    border-color: var(--success);
+    background: rgba(0,229,160,0.08);
+    color: var(--success) !important;
+  }
+  .sidebar-btn.purple-hover:hover {
+    border-color: var(--purple);
+    background: rgba(139,92,246,0.12);
+    color: var(--purple-glow) !important;
+  }
+
+  /* MAIN CONTENT adjustments - FIX RIGHT SPACE */
+  .dashboard-main {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* STATS GRID */
+  .vd-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .vd-stat {
+    background: rgba(7,20,40,0.85);
+    border: 1px solid rgba(26,107,255,0.2);
+    border-radius: 6px;
+    padding: 1.1rem;
+    text-align: center;
+    transition: all 0.25s;
+    backdrop-filter: blur(10px);
+  }
+  .vd-stat:hover {
+    border-color: rgba(26,107,255,0.5);
+    box-shadow: 0 0 20px rgba(26,107,255,0.15);
+    transform: translateY(-2px);
+  }
+  .vd-stat-icon { font-size: 1.4rem; margin-bottom: 0.4rem; display: block; }
+  .vd-stat-num { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--white); line-height: 1; margin-bottom: 0.3rem; }
+  .vd-stat-label { font-family: 'Exo 2', sans-serif; font-size: 0.68rem; color: var(--silver); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* HEADER */
+  .vd-dash-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(26,107,255,0.15);
+    position: relative;
+  }
+  .vd-dash-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 120px; height: 1px;
+    background: linear-gradient(90deg, var(--blue-electric), transparent);
+  }
+  .vd-eyebrow {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    color: var(--blue-neon);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vd-eyebrow::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--blue-neon);
+    box-shadow: 0 0 6px var(--blue-neon);
+  }
+  .vd-welcome { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--white); margin: 0 0 0.3rem; }
+  .vd-welcome span { color: var(--blue-neon); }
+  .vd-timestamp { font-family: 'Exo 2', sans-serif; font-size: 0.78rem; color: var(--silver); }
+
+  /* Hide original Django app list and modules COMPLETELY */
+  #content-main .module,
+  #content-main .app-list,
+  .dashboard-main .module,
+  .dashboard-main .app-list,
+  .dashboard-main #content-main > .module,
+  #content-main > .module,
+  .dashboard #content-main > .module {
+    display: none !important;
+  }
+  
+  /* Hide recent actions module */
+  #recent-actions-module {
+    display: none !important;
+  }
+  
+  /* Remove any extra margins/paddings that cause white space */
+  body.dashboard #content {
+    background: transparent !important;
+  }
+  
+  /* Ensure main content area fills properly */
+  .dashboard #content-main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* responsive */
+  @media (max-width: 1024px) {
+    .dashboard-container { flex-direction: column; }
+    .vd-sidebar { width: 100%; position: relative; top: 0; height: auto; margin-bottom: 1.5rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- SIDEBAR with ALL requested buttons (beautiful, arabic) -->
+  <aside class="vd-sidebar">
+    <div class="sidebar-header">
+      <h3>⚡ لوحة القيادة</h3>
+      <p><span>⏘</span> التحكم السريع · VeriDz</p>
+    </div>
+
+    <!-- CONTENT MANAGEMENT -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>📂</span> إدارة المحتوى
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/publications/create/?type=image" class="sidebar-btn"><span class="emoji-icon">📸</span> نشر صورة جديدة</a>
+        <a href="/publications/create/?type=video" class="sidebar-btn"><span class="emoji-icon">🎬</span> رفع فيديو جديد</a>
+        <a href="/publications/manage/" class="sidebar-btn"><span class="emoji-icon">🖼️</span> إدارة جميع المنشورات</a>
+        <a href="/dashboard/article/new/" class="sidebar-btn"><span class="emoji-icon">📝</span> كتابة مقال جديد</a>
+        <a href="/admin/publications/publication/?pub_type=article" class="sidebar-btn"><span class="emoji-icon">📰</span> المقالات المنشورة</a>
+        <a href="/admin/publications/comment/" class="sidebar-btn"><span class="emoji-icon">💬</span> التعليقات الحديثة</a>
+      </div>
+    </div>
+
+    <!-- USERS & PERMISSIONS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>👥</span> المستخدمون والصلاحيات
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/admin/accounts/user/" class="sidebar-btn"><span class="emoji-icon">👥</span> قائمة المستخدمين</a>
+        <a href="/admin/accounts/user/add/" class="sidebar-btn success"><span class="emoji-icon">➕</span> إضافة مستخدم جديد</a>
+        <a href="/admin/accounts/user/?is_active__exact=0" class="sidebar-btn warning"><span class="emoji-icon">⏳</span> المستخدمين غير النشطين</a>
+        <a href="/admin/auth/group/" class="sidebar-btn purple-hover"><span class="emoji-icon">🔐</span> إدارة المجموعات والصلاحيات</a>
+      </div>
+    </div>
+
+    <!-- FACT CHECK & CLAIMS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>🔍</span> التحقق من الحقائق
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/admin/factcheck/factcheckresult/" class="sidebar-btn"><span class="emoji-icon">✅</span> نتائج التحقق من الحقائق</a>
+        <a href="/admin/factcheck/claim/" class="sidebar-btn"><span class="emoji-icon">⚠️</span> الادعاءات الواردة</a>
+      </div>
+    </div>
+
+    <!-- ANALYTICS & REPORTS -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>📊</span> التقارير والإحصائيات
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/admin/publications/publication/?created_at__gte=2025-01-01" class="sidebar-btn"><span class="emoji-icon">📊</span> تقارير المنشورات السنوية</a>
+        <a href="/admin/analytics/" class="sidebar-btn purple-hover"><span class="emoji-icon">📈</span> إحصائيات الزوار</a>
+      </div>
+    </div>
+
+    <!-- SYSTEM & CONFIGURATION -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>⚙️</span> النظام والإعدادات
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/admin/sites/site/" class="sidebar-btn"><span class="emoji-icon">🌐</span> إعدادات الموقع</a>
+        <a href="/admin/contact/contactmessage/" class="sidebar-btn"><span class="emoji-icon">✉️</span> رسائل الاتصال</a>
+        <a href="/publications/" class="sidebar-btn"><span class="emoji-icon">🌍</span> معرض المنشورات</a>
+      </div>
+    </div>
+
+    <!-- EXTRAS & LOGOUT -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">
+        <span>🔓</span> الخروج
+      </div>
+      <div class="sidebar-buttons">
+        <a href="/admin/logout/" class="sidebar-btn danger"><span class="emoji-icon">🚪</span> تسجيل الخروج</a>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.6rem; opacity: 0.5; font-family: monospace;">
+      v1.0 · VeriDz Dashboard
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-main">
+    
+    <!-- HEADER -->
+    <div class="vd-dash-header">
+      <div class="vd-eyebrow">نظام الإدارة المتكامل</div>
+      <h1 class="vd-welcome">مرحباً، <span>{{ user.username }}</span></h1>
+      <div class="vd-timestamp">
+        {% now "l، d F Y — H:i" %} &nbsp;·&nbsp; لوحة تحكم فيري ديز
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="vd-stats">
+      <div class="vd-stat">
+        <span class="vd-stat-icon">🛡️</span>
+        <div class="vd-stat-num">{% if user.is_superuser %}مدير{% else %}مشرف{% endif %}</div>
+        <div class="vd-stat-label">الصلاحية</div>
+      </div>
+      <div class="vd-stat">
+        <span class="vd-stat-icon">📦</span>
+        <div class="vd-stat-num">{{ app_list|length }}</div>
+        <div class="vd-stat-label">التطبيقات النشطة</div>
+      </div>
+      <div class="vd-stat">
+        <span class="vd-stat-icon" style="filter:drop-shadow(0 0 6px rgba(0,229,160,0.5));">✅</span>
+        <div class="vd-stat-num" style="color:#00e5a0;">متصل</div>
+        <div class="vd-stat-label">حالة النظام</div>
+      </div>
+      <div class="vd-stat">
+        <span class="vd-stat-icon" style="filter:drop-shadow(0 0 6px rgba(0,212,255,0.4));">🌐</span>
+        <div class="vd-stat-num" style="font-size:0.85rem;">
+          <a href="/" style="color:var(--blue-neon) !important;text-decoration:none;">عرض الموقع</a>
+        </div>
+        <div class="vd-stat-label">الواجهة الأمامية</div>
+      </div>
+    </div>
+
+    <!-- Welcome card -->
+    <div style="background: rgba(7,20,40,0.85); border: 1px solid rgba(26,107,255,0.2); border-radius: 6px; padding: 1.5rem; text-align: center; backdrop-filter: blur(10px);">
+      <span style="font-size: 3rem; opacity: 0.7;">🚀</span>
+      <h3 style="color: var(--blue-neon); font-family: 'Orbitron', sans-serif; margin-top: 0.5rem;">لوحة تحكم متكاملة</h3>
+      <p style="color: var(--silver); font-size: 0.85rem;">استخدم القائمة الجانبية للوصول السريع إلى جميع أقسام الإدارة</p>
+    </div>
+    
+  </div>
+</div>
 {% endblock %}

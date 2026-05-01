@@ -14,6 +14,6 @@ urlpatterns = [
     path('fact-check/', include('factcheck.urls')),
     path('accounts/', include('accounts.urls')),
     path('dashboard/', include('dashboard.urls')),
-    path('publications/', include('publications.urls')),  # ← ADD THIS
+    path('publications/', include('publications.urls')),  
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
