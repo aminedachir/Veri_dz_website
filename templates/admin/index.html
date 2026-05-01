@@ -1,0 +1,76 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div style="margin-bottom:2rem;">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:0.72rem;color:#6c63ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.4rem;">
+    لوحة التحكم
+  </div>
+  <h1 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:#e8e8f0;margin:0;">
+    مرحباً، <span style="color:#6c63ff;">{{ user.username }}</span>
+  </h1>
+  <p style="color:#6b6b80;font-size:0.88rem;margin-top:0.3rem;">
+    {% now "l، d F Y" %} — VeriDz Admin Panel
+  </p>
+</div>
+
+<!-- QUICK STATS -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;">
+  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
+    <div style="font-size:1.8rem;margin-bottom:0.3rem;">📰</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#e8e8f0;">
+      {{ app_list|length }}
+    </div>
+    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">تطبيقات نشطة</div>
+  </div>
+  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
+    <div style="font-size:1.8rem;margin-bottom:0.3rem;">✅</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#00d48a;">نشط</div>
+    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">حالة النظام</div>
+  </div>
+  <div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.2rem;text-align:center;">
+    <div style="font-size:1.8rem;margin-bottom:0.3rem;">🛡️</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#a78bfa;">
+      {% if user.is_superuser %}مدير{% else %}مشرف{% endif %}
+    </div>
+    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;">صلاحيتك</div>
+  </div>
+  <div style="background:#12121a;border:1px solid rgba(108,99,255,0.2);border-radius:10px;padding:1.2rem;text-align:center;border-style:dashed;">
+    <div style="font-size:1.8rem;margin-bottom:0.3rem;">🌐</div>
+    <a href="/" style="font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;color:#6c63ff;text-decoration:none;">عرض الموقع</a>
+    <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1px;text-transform:uppercase;margin-top:0.2rem;">الواجهة الأمامية</div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div style="background:#12121a;border:1px solid #2a2a3a;border-radius:10px;padding:1.25rem;margin-bottom:2rem;">
+  <div style="font-size:0.72rem;color:#6b6b80;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1rem;">
+    ⚡ إجراءات سريعة
+  </div>
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+    <a href="/admin/publications/publication/add/"
+       style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:#a78bfa;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;transition:all 0.2s;">
+      📸 نشر صورة / فيديو
+    </a>
+    <a href="/admin/news/article/add/"
+       style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:#60a5fa;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
+      📝 إضافة مقال
+    </a>
+    <a href="/admin/accounts/user/"
+       style="background:rgba(0,212,138,0.1);border:1px solid rgba(0,212,138,0.25);color:#00d48a;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
+      👥 إدارة المستخدمين
+    </a>
+    <a href="/admin/factcheck/factcheckresult/"
+       style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
+      🔍 نتائج التحقق
+    </a>
+    <a href="/publications/"
+       style="background:rgba(255,101,132,0.1);border:1px solid rgba(255,101,132,0.25);color:#ff6584;padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;font-weight:600;text-decoration:none;">
+      🖼 صفحة المنشورات
+    </a>
+  </div>
+</div>
+
+<!-- APP LIST -->
+{{ block.super }}
+{% endblock %}
