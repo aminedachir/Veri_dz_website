@@ -11,3 +11,5 @@ class CustomUserAdmin(UserAdmin):
         ('VeriDz', {'fields': ('is_journalist', 'bio', 'organization', 'avatar')}),
     )
     search_fields = ('username', 'email', 'organization')
+
+

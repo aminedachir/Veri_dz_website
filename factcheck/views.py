@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib import messages
 from .models import FactCheckResult
-from .ai_service import analyze_with_claude
+from .ai_service import analyze_with_gemini
 
 
 def _split_semicolons(value: str) -> list:
@@ -24,7 +24,7 @@ def factcheck_view(request):
         elif len(input_text) < 10 and not input_url:
             error = "النص قصير جداً للتحليل الموثوق (10 أحرف على الأقل)."
         else:
-            analysis = analyze_with_claude(input_text, url=input_url)
+            analysis = analyze_with_gemini(input_text, url=input_url)
 
             if 'error' in analysis:
                 error = analysis['error']
@@ -40,7 +40,6 @@ def factcheck_view(request):
                     red_flags=analysis.get('red_flags', ''),
                     sources_suggested=analysis.get('sources_suggested', ''),
                 )
-                # Build parsed lists for the template (fixes the result_data bug)
                 result_data = {
                     'key_claims_list': _split_semicolons(result.key_claims),
                     'red_flags_list': _split_semicolons(result.red_flags),
@@ -49,7 +48,7 @@ def factcheck_view(request):
 
     context = {
         'result': result,
-        'result_data': result_data,   # <-- was missing, fixing Bug #1
+        'result_data': result_data,
         'error': error,
         'recent_checks': recent_checks,
         'input_text': request.POST.get('text', request.GET.get('q', '')),
