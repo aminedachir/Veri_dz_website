@@ -12,48 +12,49 @@
 .fc-textarea { min-height: 150px; resize: vertical; }
 .char-count { font-family: var(--font-body); font-size: 0.78rem; color: var(--vd-silver); text-align: left; margin-top: 0.3rem; }
 
+/* ── بطاقة النتيجة ── */
 .result-card { border-radius: 10px; padding: 2rem; border: 1px solid; margin-bottom: 2rem; animation: fadeUp 0.4s ease; backdrop-filter: blur(10px); }
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-.result-card.true      { background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.4); }
-.result-card.false     { background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.4); }
-.result-card.misleading{ background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.4); }
-.result-card.partial   { background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.4); }
-.result-card.unverifiable { background:rgba(107,114,128,0.07);border-color:rgba(107,114,128,0.4); }
 
-.verdict-icon { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1rem; }
-.verdict-icon.true     { background:rgba(16,185,129,0.15);color:#10b981; }
-.verdict-icon.false    { background:rgba(239,68,68,0.15);color:#ef4444; }
-.verdict-icon.misleading{background:rgba(245,158,11,0.15);color:#f59e0b; }
-.verdict-icon.partial  { background:rgba(139,92,246,0.15);color:#8b5cf6; }
-.verdict-icon.unverifiable{background:rgba(107,114,128,0.15);color:#6b7280;}
+.result-card.trusted     { background:rgba(16,185,129,0.07); border-color:rgba(16,185,129,0.4); }
+.result-card.no_evidence { background:rgba(239,68,68,0.07);  border-color:rgba(239,68,68,0.4); }
+.result-card.uncertain   { background:rgba(107,114,128,0.07);border-color:rgba(107,114,128,0.4); }
+.result-card.conflicting { background:rgba(245,158,11,0.07); border-color:rgba(245,158,11,0.4); }
 
-.verdict-title { font-family: var(--font-main); font-size: 2rem; font-weight: 800; }
-.verdict-title.true      { color: #34d399; }
-.verdict-title.false     { color: #f87171; }
-.verdict-title.misleading{ color: #fbbf24; }
-.verdict-title.partial   { color: #a78bfa; }
-.verdict-title.unverifiable { color: #9ca3af; }
+/* ── أيقونة الحكم ── */
+.verdict-icon { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:1rem; }
+.verdict-icon.trusted     { background:rgba(16,185,129,0.15); color:#10b981; }
+.verdict-icon.no_evidence { background:rgba(239,68,68,0.15);  color:#ef4444; }
+.verdict-icon.uncertain   { background:rgba(107,114,128,0.15);color:#6b7280; }
+.verdict-icon.conflicting { background:rgba(245,158,11,0.15); color:#f59e0b; }
 
-.conf-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 8px; overflow: hidden; margin: 0.6rem 0 0.3rem; }
-.conf-bar { height: 100%; border-radius: 4px; transition: width 1s ease; }
-.conf-bar.true     { background: linear-gradient(270deg, #10b981, #34d399); }
-.conf-bar.false    { background: linear-gradient(270deg, #ef4444, #f87171); }
-.conf-bar.misleading{background: linear-gradient(270deg, #f59e0b, #fbbf24); }
-.conf-bar.partial  { background: linear-gradient(270deg, #8b5cf6, #a78bfa); }
-.conf-bar.unverifiable{background:linear-gradient(270deg,#6b7280,#9ca3af);}
+/* ── عنوان الحكم ── */
+.verdict-title { font-family:var(--font-main); font-size:2rem; font-weight:800; }
+.verdict-title.trusted     { color:#34d399; }
+.verdict-title.no_evidence { color:#f87171; }
+.verdict-title.uncertain   { color:#9ca3af; }
+.verdict-title.conflicting { color:#fbbf24; }
 
-.detail-section { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 1rem 1.2rem; margin-top: 1rem; }
-.detail-label { font-family: var(--font-body); font-size: 0.75rem; color: var(--vd-bright); letter-spacing: 1px; margin-bottom: 0.5rem; }
-.tag-pill { display: inline-block; background: rgba(59,130,246,0.1); border: 1px solid var(--vd-border); border-radius: 20px; padding: 0.2rem 0.8rem; font-size: 0.82rem; color: var(--vd-silver); margin: 0.2rem; font-family: var(--font-body); }
-.tag-pill.red { background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171; }
+/* ── شريط الثقة ── */
+.conf-bar-wrap { background:rgba(255,255,255,0.06); border-radius:4px; height:8px; overflow:hidden; margin:0.6rem 0 0.3rem; }
+.conf-bar { height:100%; border-radius:4px; transition:width 1s ease; }
+.conf-bar.trusted     { background:linear-gradient(270deg,#10b981,#34d399); }
+.conf-bar.no_evidence { background:linear-gradient(270deg,#ef4444,#f87171); }
+.conf-bar.uncertain   { background:linear-gradient(270deg,#6b7280,#9ca3af); }
+.conf-bar.conflicting { background:linear-gradient(270deg,#f59e0b,#fbbf24); }
 
-.recent-row { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--vd-border); }
-.recent-row:last-child { border-bottom: none; }
-.mini-badge { font-family: var(--font-main); font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+.detail-section { background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:1rem 1.2rem; margin-top:1rem; }
+.detail-label { font-family:var(--font-body); font-size:0.75rem; color:var(--vd-bright); letter-spacing:1px; margin-bottom:0.5rem; }
+.tag-pill { display:inline-block; background:rgba(59,130,246,0.1); border:1px solid var(--vd-border); border-radius:20px; padding:0.2rem 0.8rem; font-size:0.82rem; color:var(--vd-silver); margin:0.2rem; font-family:var(--font-body); }
+.tag-pill.red { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171; }
 
-.analyzing-spinner { display: none; align-items: center; gap: 0.8rem; color: var(--vd-bright); font-family: var(--font-body); font-size: 0.9rem; margin-top: 1rem; }
-.spinner-ring { width: 20px; height: 20px; border: 2px solid rgba(59,130,246,0.2); border-top-color: var(--vd-bright); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.recent-row { display:flex; align-items:center; gap:1rem; padding:0.7rem 0; border-bottom:1px solid var(--vd-border); }
+.recent-row:last-child { border-bottom:none; }
+.mini-badge { font-family:var(--font-main); font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:3px; white-space:nowrap; flex-shrink:0; }
+
+.analyzing-spinner { display:none; align-items:center; gap:0.8rem; color:var(--vd-bright); font-family:var(--font-body); font-size:0.9rem; margin-top:1rem; }
+.spinner-ring { width:20px; height:20px; border:2px solid rgba(59,130,246,0.2); border-top-color:var(--vd-bright); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
 </style>
 {% endblock %}
 
@@ -118,26 +119,24 @@
                 </form>
             </div>
 
-            <!-- النتيجة -->
+            <!-- ── النتيجة ── -->
             {% if result %}
             <div class="result-card {{ result.verdict }}">
                 <div class="row g-4 align-items-start">
                     <div class="col-sm-auto">
                         <div class="verdict-icon {{ result.verdict }}">
-                            {% if result.verdict == 'true' %}<i class="bi bi-check-lg"></i>
-                            {% elif result.verdict == 'false' %}<i class="bi bi-x-lg"></i>
-                            {% elif result.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle"></i>
-                            {% elif result.verdict == 'partial' %}<i class="bi bi-slash-circle"></i>
-                            {% else %}<i class="bi bi-question-lg"></i>{% endif %}
+                            {% if result.verdict == 'trusted' %}<i class="bi bi-patch-check-fill"></i>
+                            {% elif result.verdict == 'no_evidence' %}<i class="bi bi-x-circle-fill"></i>
+                            {% elif result.verdict == 'conflicting' %}<i class="bi bi-exclamation-triangle-fill"></i>
+                            {% else %}<i class="bi bi-question-circle-fill"></i>{% endif %}
                         </div>
                     </div>
                     <div class="col">
                         <div class="verdict-title {{ result.verdict }}">
-                            {% if result.verdict == 'true' %}✓ صحيح
-                            {% elif result.verdict == 'false' %}✗ خاطئ
-                            {% elif result.verdict == 'misleading' %}⚠ مضلل
-                            {% elif result.verdict == 'partial' %}≈ جزئي
-                            {% else %}؟ غير قابل للتحقق{% endif %}
+                            {% if result.verdict == 'trusted' %}✓ موثوق جداً
+                            {% elif result.verdict == 'no_evidence' %}✗ لا يوجد أدلة كافية
+                            {% elif result.verdict == 'conflicting' %}⚠ مصادر متعارضة
+                            {% else %}؟ غير مؤكد{% endif %}
                         </div>
                         <div style="font-family:var(--font-body);font-size:0.85rem;color:var(--vd-silver);margin-top:0.5rem;">
                             مستوى الثقة: <strong style="color:var(--vd-white);">{{ result.confidence_pct }}%</strong>
@@ -192,7 +191,7 @@
             {% endif %}
         </div>
 
-        <!-- الشريط الجانبي -->
+        <!-- ── الشريط الجانبي ── -->
         <div class="col-lg-4">
             <div class="vd-card mb-3">
                 <div class="vd-card-title mb-3"><i class="bi bi-lightbulb me-2 text-vd-accent"></i>كيف يعمل؟</div>
@@ -207,11 +206,22 @@
             <div class="vd-card mb-3">
                 <div class="vd-card-title mb-3"><i class="bi bi-info-circle me-2 text-vd-accent"></i>معنى الأحكام</div>
                 <div style="font-size:0.85rem;font-family:var(--font-body);">
-                    <div class="d-flex align-items-start gap-2 mb-2"><span style="color:#34d399;">✓</span><div><strong style="color:#34d399;">صحيح</strong> <span class="text-vd-silver">— معلومة محققة ودقيقة</span></div></div>
-                    <div class="d-flex align-items-start gap-2 mb-2"><span style="color:#f87171;">✗</span><div><strong style="color:#f87171;">خاطئ</strong> <span class="text-vd-silver">— معلومة كاذبة أو ملفقة</span></div></div>
-                    <div class="d-flex align-items-start gap-2 mb-2"><span style="color:#fbbf24;">⚠</span><div><strong style="color:#fbbf24;">مضلل</strong> <span class="text-vd-silver">— مقدمة بطريقة مضللة</span></div></div>
-                    <div class="d-flex align-items-start gap-2 mb-2"><span style="color:#a78bfa;">≈</span><div><strong style="color:#a78bfa;">جزئي</strong> <span class="text-vd-silver">— صحيح جزئياً، يحتاج تفصيلاً</span></div></div>
-                    <div class="d-flex align-items-start gap-2"><span style="color:#9ca3af;">?</span><div><strong style="color:#9ca3af;">غير قابل للتحقق</strong> <span class="text-vd-silver">— يستحيل التأكد منه</span></div></div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#34d399;">✓</span>
+                        <div><strong style="color:#34d399;">موثوق جداً</strong> <span class="text-vd-silver">— معلومة محققة ودقيقة</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#f87171;">✗</span>
+                        <div><strong style="color:#f87171;">لا يوجد أدلة كافية</strong> <span class="text-vd-silver">— لا توجد أدلة تدعم الادعاء</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#fbbf24;">⚠</span>
+                        <div><strong style="color:#fbbf24;">مصادر متعارضة</strong> <span class="text-vd-silver">— المصادر تتناقض حول الادعاء</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span style="color:#9ca3af;">?</span>
+                        <div><strong style="color:#9ca3af;">غير مؤكد</strong> <span class="text-vd-silver">— يصعب الجزم بصحته أو خطئه</span></div>
+                    </div>
                 </div>
             </div>
 
@@ -223,11 +233,14 @@
                 </div>
                 {% for check in recent_checks %}
                 <div class="recent-row">
-                    <span class="mini-badge {% if check.verdict == 'true' %}badge-verified{% elif check.verdict == 'false' %}badge-fake{% else %}badge-unverified{% endif %}">
-                        {% if check.verdict == 'true' %}✓ صحيح
-                        {% elif check.verdict == 'false' %}✗ خاطئ
-                        {% elif check.verdict == 'misleading' %}⚠ مضلل
-                        {% else %}؟{% endif %}
+                    <span class="mini-badge
+                        {% if check.verdict == 'trusted' %}badge-verified
+                        {% elif check.verdict == 'no_evidence' %}badge-fake
+                        {% else %}badge-unverified{% endif %}">
+                        {% if check.verdict == 'trusted' %}✓ موثوق جداً
+                        {% elif check.verdict == 'no_evidence' %}✗ لا أدلة
+                        {% elif check.verdict == 'conflicting' %}⚠ متعارض
+                        {% else %}؟ غير مؤكد{% endif %}
                     </span>
                     <span style="font-size:0.83rem;color:var(--vd-silver);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-body);">
                         {{ check.input_text|truncatechars:50 }}
@@ -243,7 +256,6 @@
 
 {% block extra_js %}
 <script>
-// ── Tab switching ──────────────────────────────────────────────────
 let activeTab = 'text';
 
 function switchTab(tab, btn) {
@@ -254,19 +266,16 @@ function switchTab(tab, btn) {
     document.getElementById('url-panel').style.display  = tab === 'url'  ? 'block' : 'none';
 }
 
-// Bug #4 fix: Restore correct tab after POST round-trip
 (function restoreTab() {
     const inputUrl  = "{{ input_url|escapejs }}";
     const inputText = "{{ input_text|escapejs }}";
     if (inputUrl && !inputText) {
-        // URL tab was active
         switchTab('url', document.getElementById('tab-url'));
     } else {
         switchTab('text', document.getElementById('tab-text'));
     }
 })();
 
-// ── Character counter ──────────────────────────────────────────────
 const textarea = document.getElementById('fc-text');
 const counter  = document.getElementById('char-count');
 if (textarea) {
@@ -274,7 +283,6 @@ if (textarea) {
     counter.textContent = textarea.value.length;
 }
 
-// ── Clear form ─────────────────────────────────────────────────────
 function clearForm() {
     if (textarea) textarea.value = '';
     const urlInput = document.getElementById('fc-url');
@@ -282,14 +290,12 @@ function clearForm() {
     if (counter) counter.textContent = '0';
 }
 
-// ── Submit handling ────────────────────────────────────────────────
 function onSubmit() {
     document.getElementById('submit-btn').disabled = true;
     document.getElementById('submit-btn').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>جارٍ التحليل…';
     document.getElementById('spinner').style.display = 'flex';
 }
 
-// Bug #3 fix: Reset button when page is restored from cache (back button)
 window.addEventListener('pageshow', function(e) {
     if (e.persisted) {
         const btn = document.getElementById('submit-btn');

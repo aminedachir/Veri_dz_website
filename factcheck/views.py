@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.contrib import messages
 from .models import FactCheckResult
 from .ai_service import analyze_with_gemini
 
@@ -33,7 +32,7 @@ def factcheck_view(request):
                     user=request.user if request.user.is_authenticated else None,
                     input_text=input_text or input_url,
                     input_url=input_url,
-                    verdict=analysis.get('verdict', 'unverifiable'),
+                    verdict=analysis.get('verdict', 'uncertain'),
                     confidence_score=float(analysis.get('confidence_score', 0.5)),
                     explanation=analysis.get('explanation', ''),
                     key_claims=analysis.get('key_claims', ''),
@@ -42,17 +41,17 @@ def factcheck_view(request):
                 )
                 result_data = {
                     'key_claims_list': _split_semicolons(result.key_claims),
-                    'red_flags_list': _split_semicolons(result.red_flags),
-                    'sources_list': _split_semicolons(result.sources_suggested),
+                    'red_flags_list':  _split_semicolons(result.red_flags),
+                    'sources_list':    _split_semicolons(result.sources_suggested),
                 }
 
     context = {
-        'result': result,
+        'result':      result,
         'result_data': result_data,
-        'error': error,
+        'error':       error,
         'recent_checks': recent_checks,
-        'input_text': request.POST.get('text', request.GET.get('q', '')),
-        'input_url': request.POST.get('url', request.GET.get('url', '')),
+        'input_text':  request.POST.get('text', request.GET.get('q', '')),
+        'input_url':   request.POST.get('url', request.GET.get('url', '')),
     }
     return render(request, 'factcheck/factcheck.html', context)
 

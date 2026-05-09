@@ -17,6 +17,7 @@
     transition: border-color 0.2s;
 }
 .hist-row:hover { border-color: rgba(59,130,246,0.4); }
+
 .hist-verdict-badge {
     font-family: var(--font-mono);
     font-size: 0.75rem;
@@ -26,12 +27,14 @@
     flex-shrink: 0;
     border: 1px solid;
 }
-.hv-true       { background:rgba(16,185,129,0.12);color:#34d399;border-color:rgba(16,185,129,0.35); }
-.hv-false      { background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.35); }
-.hv-misleading { background:rgba(245,158,11,0.12);color:#fbbf24;border-color:rgba(245,158,11,0.35); }
-.hv-partial    { background:rgba(139,92,246,0.12);color:#a78bfa;border-color:rgba(139,92,246,0.35); }
-.hv-unverifiable { background:rgba(107,114,128,0.12);color:#9ca3af;border-color:rgba(107,114,128,0.35); }
-.conf-mini { font-family:var(--font-mono);font-size:0.72rem;color:var(--vd-silver); }
+
+/* الألوان الجديدة للبادجات */
+.hv-trusted     { background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.35); }
+.hv-no_evidence { background:rgba(239,68,68,0.12);  color:#f87171; border-color:rgba(239,68,68,0.35); }
+.hv-conflicting { background:rgba(245,158,11,0.12); color:#fbbf24; border-color:rgba(245,158,11,0.35); }
+.hv-uncertain   { background:rgba(107,114,128,0.12);color:#9ca3af; border-color:rgba(107,114,128,0.35); }
+
+.conf-mini { font-family:var(--font-mono); font-size:0.72rem; color:var(--vd-silver); }
 </style>
 {% endblock %}
 
@@ -49,11 +52,10 @@
     {% for check in checks %}
     <div class="hist-row">
         <div class="hist-verdict-badge hv-{{ check.verdict }}">
-            {% if check.verdict == 'true' %}✓ صحيح
-            {% elif check.verdict == 'false' %}✗ خاطئ
-            {% elif check.verdict == 'misleading' %}⚠ مضلل
-            {% elif check.verdict == 'partial' %}≈ جزئي
-            {% else %}؟ غ.م{% endif %}
+            {% if check.verdict == 'trusted' %}✓ موثوق جداً
+            {% elif check.verdict == 'no_evidence' %}✗ لا أدلة كافية
+            {% elif check.verdict == 'conflicting' %}⚠ متعارض
+            {% else %}؟ غير مؤكد{% endif %}
         </div>
         <div class="flex-grow-1">
             <div style="font-size:0.92rem;color:var(--vd-white);margin-bottom:0.4rem;">

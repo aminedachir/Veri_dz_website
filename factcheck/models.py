@@ -4,11 +4,10 @@ from django.conf import settings
 
 class FactCheckResult(models.Model):
     VERDICT_CHOICES = [
-        ('true', 'Vrai'),
-        ('false', 'Faux'),
-        ('misleading', 'Trompeur'),
-        ('partial', 'Partiellement vrai'),
-        ('unverifiable', 'Non vérifiable'),
+        ('trusted',     'موثوق جداً'),
+        ('no_evidence', 'لا يوجد أدلة كافية'),
+        ('uncertain',   'غير مؤكد'),
+        ('conflicting', 'مصادر متعارضة'),
     ]
 
     user = models.ForeignKey(
@@ -30,10 +29,13 @@ class FactCheckResult(models.Model):
     def confidence_pct(self):
         return int(self.confidence_score * 100)
 
+    def verdict_label(self):
+        return dict(self.VERDICT_CHOICES).get(self.verdict, self.verdict)
+
     def __str__(self):
         return f"[{self.verdict}] {self.input_text[:60]}"
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Résultat de vérification'
-        verbose_name_plural = 'Résultats de vérification'
+        verbose_name = 'نتيجة تحقق'
+        verbose_name_plural = 'نتائج التحقق'
