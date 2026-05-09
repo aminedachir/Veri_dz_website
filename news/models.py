@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 
 
 class Category(models.Model):
@@ -38,11 +39,25 @@ class Article(models.Model):
     is_verified = models.BooleanField(default=False)
     verdict = models.CharField(max_length=20, choices=VERDICT_CHOICES, default='unverified')
     verdict_explanation = models.TextField(blank=True)
-    image = models.ImageField(upload_to='articles/', blank=True, null=True)
     views_count = models.PositiveIntegerField(default=0)
+
+    # ─── Cloudinary Field ─────────────────────────────────────────────────────
+    image = CloudinaryField(
+        'image',
+        folder='articles/',
+        blank=True,
+        null=True,
+        resource_type='image',
+    )
 
     def __str__(self):
         return self.title
+
+    def get_image_url(self):
+        """Returns the Cloudinary URL for the article image."""
+        if self.image:
+            return self.image.url
+        return None
 
     class Meta:
         ordering = ['-created_at']

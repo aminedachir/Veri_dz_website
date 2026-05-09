@@ -1,2 +1,20 @@
+# ─── Django Core ──────────────────────────────────────────────────────────────
 Django>=4.2,<5.0
 Pillow>=10.0.0
+
+# ─── PostgreSQL ───────────────────────────────────────────────────────────────
+psycopg2-binary>=2.9.9       # Driver PostgreSQL pour Django
+dj-database-url>=2.1.0       # Parse DATABASE_URL → dict Django
+
+# ─── Static files (Render n'a pas Nginx) ─────────────────────────────────────
+whitenoise>=6.6.0
+
+# ─── Cloudinary (stockage média) ──────────────────────────────────────────────
+cloudinary>=1.40.0
+django-cloudinary-storage>=0.3.0
+
+# ─── Environnement ────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ─── Serveur WSGI pour Render ─────────────────────────────────────────────────
+gunicorn>=21.2.0
