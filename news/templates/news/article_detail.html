@@ -59,10 +59,10 @@
             {% if article.verdict != 'unverified' %}
             <div class="verdict-panel {{ article.verdict }}">
                 <div class="verdict-label">
-                    {% if article.verdict == 'true' %}<i class="bi bi-check-circle me-2" style="color:#10b981;"></i>صحيح
-                    {% elif article.verdict == 'false' %}<i class="bi bi-x-circle me-2" style="color:#ef4444;"></i>خاطئ
-                    {% elif article.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle me-2" style="color:#f59e0b;"></i>مضلل
-                    {% elif article.verdict == 'partial' %}<i class="bi bi-slash-circle me-2" style="color:#8b5cf6;"></i>صحيح جزئياً
+                    {% if article.verdict == 'true' %}<i class="bi bi-check-circle me-2" style="color:#10b981;"></i>موثوق جدا
+                    {% elif article.verdict == 'false' %}<i class="bi bi-x-circle me-2" style="color:#ef4444;"></i>لا يوجد أدلة كافية
+                    {% elif article.verdict == 'misleading' %}<i class="bi bi-exclamation-triangle me-2" style="color:#f59e0b;"></i>مصادر متعارضة
+                    {% elif article.verdict == 'partial' %}<i class="bi bi-slash-circle me-2" style="color:#8b5cf6;"></i>غير مؤكد 
                     {% endif %}
                 </div>
                 {% if article.verdict_explanation %}

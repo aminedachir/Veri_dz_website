@@ -54,9 +54,10 @@
                 <i class="bi {{ cat.icon }} me-1"></i>{{ cat.name }}
             </a>
             {% endfor %}
-            <a href="/news/?verdict=true{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'true' %}active{% endif %}" style="color:#34d399;border-color:rgba(16,185,129,0.4);">✓ صحيح</a>
-            <a href="/news/?verdict=false{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'false' %}active{% endif %}" style="color:#f87171;border-color:rgba(239,68,68,0.4);">✗ خاطئ</a>
-            <a href="/news/?verdict=misleading{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'misleading' %}active{% endif %}" style="color:#fbbf24;border-color:rgba(245,158,11,0.4);">⚠ مضلل</a>
+            <a href="/news/?verdict=true{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'true' %}active{% endif %}" style="color:#34d399;border-color:rgba(16,185,129,0.4);">✓ موثوق جداً</a>
+            <a href="/news/?verdict=false{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'false' %}active{% endif %}" style="color:#f87171;border-color:rgba(239,68,68,0.4);">✗ 
+لا يوجد أدلة كافية</a>
+            <a href="/news/?verdict=misleading{% if search %}&q={{ search }}{% endif %}" class="filter-chip {% if selected_verdict == 'misleading' %}active{% endif %}" style="color:#fbbf24;border-color:rgba(245,158,11,0.4);">⚠ مصادر متعارضة</a>
         </div>
     </div>
 
@@ -88,10 +89,10 @@
                     <div class="d-flex align-items-center gap-2">
                         <span>{{ article.created_at|date:"d M Y" }}</span>
                         <span class="verdict-badge verdict-{{ article.verdict }}">
-                            {% if article.verdict == 'true' %}✓ صحيح
-                            {% elif article.verdict == 'false' %}✗ خاطئ
-                            {% elif article.verdict == 'misleading' %}⚠ مضلل
-                            {% elif article.verdict == 'partial' %}≈ جزئي
+                            {% if article.verdict == 'true' %}✓ موثوق جداً
+                            {% elif article.verdict == 'false' %}✗ لا يوجد أدلة كافية
+                            {% elif article.verdict == 'misleading' %}⚠ مصادر متعارضة
+                            {% elif article.verdict == 'partial' %}≈ غير مؤكد
                             {% else %}؟ غير محقق{% endif %}
                         </span>
                     </div>
