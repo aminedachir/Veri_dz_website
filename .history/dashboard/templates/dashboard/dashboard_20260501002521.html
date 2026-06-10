@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% block title %}لوحة التحكم — VeriDz{% endblock %}
+{% block nav_dash %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+/* RTL Support */
+html, body { direction: rtl; }
+
+.dash-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--vd-border);
+    margin-bottom: 2rem;
+}
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    text-align: center;
+    transition: border-color 0.25s;
+}
+.stat-card:hover { border-color: rgba(59,130,246,0.5); }
+.stat-card .s-num {
+    font-family: var(--font-head);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--vd-bright);
+    line-height: 1;
+}
+.stat-card .s-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--vd-silver);
+    letter-spacing: 1px;
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+}
+.stat-card .s-icon { font-size: 1.3rem; color: rgba(59,130,246,0.5); margin-bottom: 0.4rem; }
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--vd-border);
+}
+.section-title {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--vd-white);
+}
+
+.art-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid rgba(59,130,246,0.08);
+    transition: background 0.2s;
+}
+.art-row:last-child { border-bottom: none; }
+.art-row:hover { background: rgba(59,130,246,0.04); border-radius: 4px; padding-right: 0.5rem; padding-left: 0; }
+.art-title {
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    color: var(--vd-white);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.art-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+.btn-sm-vd {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 3px;
+    border: 1px solid var(--vd-border);
+    color: var(--vd-silver);
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-sm-vd:hover { border-color: var(--vd-bright); color: var(--vd-bright); }
+.btn-sm-vd.del { border-color: rgba(239,68,68,0.3); color: #f87171; }
+.btn-sm-vd.del:hover { background: rgba(239,68,68,0.1); }
+
+.journalist-badge {
+    background: rgba(37,99,235,0.15);
+    border: 1px solid rgba(37,99,235,0.35);
+    color: var(--vd-bright);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+/* RTL icon spacing fixes */
+.me-1, .me-2 { margin-left: 0.25rem !important; margin-right: 0 !important; }
+
+/* ── ADMIN PUBLICATIONS SECTION ── */
+.admin-pub-zone {
+    background: linear-gradient(135deg, rgba(139,92,246,0.07) 0%, rgba(59,130,246,0.05) 100%);
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-pub-zone .zone-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    color: #a78bfa;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+}
+
+.admin-pub-zone .zone-title {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--vd-white);
+    margin-bottom: 1.1rem;
+}
+
+.pub-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+}
+
+.pub-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    border-radius: 8px;
+    border: 1px dashed rgba(139,92,246,0.35);
+    background: rgba(139,92,246,0.06);
+    color: #a78bfa;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    transition: all 0.22s;
+    cursor: pointer;
+}
+
+.pub-action-btn:hover {
+    border-color: #a78bfa;
+    background: rgba(139,92,246,0.15);
+    color: #c4b5fd;
+    transform: translateY(-2px);
+}
+
+.pub-action-btn i { font-size: 1.5rem; }
+
+.pub-action-btn.video-btn {
+    border-color: rgba(239,68,68,0.3);
+    background: rgba(239,68,68,0.06);
+    color: #f87171;
+}
+.pub-action-btn.video-btn:hover {
+    border-color: #f87171;
+    background: rgba(239,68,68,0.13);
+    color: #fca5a5;
+}
+
+.recent-pubs-mini {
+    border-top: 1px solid rgba(139,92,246,0.15);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+.recent-pubs-mini .rp-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--vd-silver);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rp-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(139,92,246,0.08);
+}
+.rp-row:last-child { border-bottom: none; }
+
+.rp-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    object-fit: cover;
+    background: rgba(139,92,246,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.rp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.rp-info { flex: 1; overflow: hidden; }
+.rp-title {
+    font-size: 0.82rem;
+    color: var(--vd-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rp-meta { font-family: var(--font-mono); font-size: 0.68rem; color: var(--vd-silver); }
+
+.rp-type-badge {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    padding: 0.12rem 0.4rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+.rp-type-badge.image { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.rp-type-badge.video { background: rgba(239,68,68,0.15); color: #f87171; }
+
+.pub-view-all {
+    display: block;
+    text-align: center;
+    margin-top: 0.9rem;
+    padding: 0.5rem;
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 6px;
+    color: #a78bfa;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.pub-view-all:hover {
+    background: rgba(139,92,246,0.1);
+    border-color: #a78bfa;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dash-header">
+        <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--vd-bright);letter-spacing:2px;margin-bottom:0.5rem;">لوحة التحكم</div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="vd-section-title mb-0">
+                    مرحباً، <span class="accent">{{ user.username }}</span>
+                    {% if user.is_journalist %}<span class="journalist-badge">صحفي</span>{% endif %}
+                    {% if user.is_staff %}<span class="journalist-badge" style="color:#a78bfa;border-color:rgba(139,92,246,0.35);background:rgba(139,92,246,0.1);">مشرف</span>{% endif %}
+                </h1>
+                <p class="text-vd-silver mb-0" style="font-size:0.88rem;margin-top:0.3rem;">
+                    {{ user.email }}{% if user.organization %} · {{ user.organization }}{% endif %}
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                {% if user.is_journalist or user.is_staff %}
+                <a href="/dashboard/article/new/" class="btn-vd-primary">
+                    <i class="bi bi-plus-lg me-1"></i>مقال جديد
+                </a>
+                {% endif %}
+                <a href="/accounts/profile/" class="btn-vd-outline">
+                    <i class="bi bi-person-gear me-1"></i>الملف الشخصي
+                </a>
+                {% if user.is_staff %}
+                <a href="/admin/" class="btn-vd-outline" style="border-color:rgba(139,92,246,0.5);color:#a78bfa;">
+                    <i class="bi bi-shield-lock me-1"></i>لوحة الإدارة
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="s-icon"><i class="bi bi-newspaper"></i></div>
+            <div class="s-num">{{ stats.total }}</div>
+            <div class="s-label">المقالات المنشورة</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-icon" style="color:rgba(16,185,129,0.5);"><i class="bi bi-check-circle"></i></div>
+            <div class="s-num" style="color:#34d399;">{{ stats.verified }}</div>
+            <div class="s-label">موثّقة</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-icon" style="color:rgba(245,158,11,0.5);"><i class="bi bi-hourglass-split"></i></div>
+            <div class="s-num" style="color:#fbbf24;">{{ stats.pending }}</div>
+            <div class="s-label">قيد الانتظار</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-icon" style="color:rgba(139,92,246,0.5);"><i class="bi bi-eye"></i></div>
+            <div class="s-num" style="color:#a78bfa;">{{ stats.views }}</div>
+            <div class="s-label">إجمالي المشاهدات</div>
+        </div>
+        <div class="stat-card">
+            <div class="s-icon"><i class="bi bi-shield-check"></i></div>
+            <div class="s-num">{{ stats.checks }}</div>
+            <div class="s-label">تحققات الذكاء الاصطناعي</div>
+        </div>
+        {% if user.is_staff %}
+        <div class="stat-card" style="border-color:rgba(139,92,246,0.2);">
+            <div class="s-icon" style="color:rgba(139,92,246,0.5);"><i class="bi bi-images"></i></div>
+            <div class="s-num" style="color:#a78bfa;">{{ stats.publications|default:0 }}</div>
+            <div class="s-label">المنشورات</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <!-- المقالات -->
+        <div class="col-lg-8">
+
+            <!-- ── ADMIN ONLY: PUBLICATIONS ZONE ── -->
+            {% if user.is_staff %}
+            <div class="admin-pub-zone">
+                <div class="zone-label"><i class="bi bi-shield-fill me-1"></i>صلاحيات المشرف</div>
+                <div class="zone-title">نشر المحتوى المرئي</div>
+
+                <div class="pub-action-grid">
+                    <a href="/publications/create/?type=image" class="pub-action-btn">
+                        <i class="bi bi-image-fill"></i>
+                        نشر صورة
+                    </a>
+                    <a href="/publications/create/?type=video" class="pub-action-btn video-btn">
+                        <i class="bi bi-camera-video-fill"></i>
+                        نشر فيديو
+                    </a>
+                </div>
+
+                <!-- Recent publications mini list -->
+                {% if recent_publications %}
+                <div class="recent-pubs-mini">
+                    <div class="rp-label">
+                        <span>آخر المنشورات</span>
+                        <a href="/publications/" style="color:#a78bfa;text-decoration:none;font-size:0.68rem;">عرض الكل ←</a>
+                    </div>
+                    {% for pub in recent_publications %}
+                    <div class="rp-row">
+                        <div class="rp-thumb">
+                            {% if pub.pub_type == 'image' and pub.image %}
+                                <img src="{{ pub.image.url }}" alt="">
+                            {% elif pub.pub_type == 'video' and pub.thumbnail %}
+                                <img src="{{ pub.thumbnail.url }}" alt="">
+                            {% elif pub.pub_type == 'video' %}
+                                🎬
+                            {% else %}
+                                🖼
+                            {% endif %}
+                        </div>
+                        <div class="rp-info">
+                            <div class="rp-title">{{ pub.title }}</div>
+                            <div class="rp-meta">{{ pub.created_at|date:"d/m/Y" }} · {{ pub.views_count }} مشاهدة</div>
+                        </div>
+                        <span class="rp-type-badge {{ pub.pub_type }}">
+                            {% if pub.pub_type == 'image' %}صورة{% else %}فيديو{% endif %}
+                        </span>
+                        <div class="art-actions">
+                            <a href="/publications/{{ pub.pk }}/edit/" class="btn-sm-vd"><i class="bi bi-pencil"></i></a>
+                            <form method="post" action="/publications/{{ pub.pk }}/delete/" style="display:inline;"
+                                  onsubmit="return confirm('هل تريد حذف هذا المنشور؟')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm-vd del"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="/publications/manage/" class="pub-view-all">
+                        <i class="bi bi-grid me-1"></i>إدارة جميع المنشورات
+                    </a>
+                </div>
+                {% else %}
+                <div style="text-align:center;padding:1rem 0 0.5rem;color:var(--vd-silver);font-size:0.85rem;">
+                    <i class="bi bi-images" style="font-size:1.8rem;color:rgba(139,92,246,0.25);display:block;margin-bottom:0.4rem;"></i>
+                    لا توجد منشورات بعد. ابدأ بنشر صورة أو فيديو!
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <!-- ── END ADMIN ZONE ── -->
+
+            <div class="vd-card">
+                <div class="section-head">
+                    <span class="section-title"><i class="bi bi-newspaper me-2 text-vd-accent"></i>مقالاتي</span>
+                    {% if user.is_journalist or user.is_staff %}
+                    <a href="/dashboard/article/new/" class="btn-sm-vd" style="border-color:rgba(59,130,246,0.4);color:var(--vd-bright);">
+                        <i class="bi bi-plus me-1"></i>جديد
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if articles %}
+                {% for article in articles %}
+                <div class="art-row">
+                    <div class="flex-shrink-0">
+                        {% if article.verdict == 'true' %}
+                        <span class="badge-verified" style="font-size:0.65rem;padding:0.15rem 0.4rem;">✓</span>
+                        {% elif article.verdict == 'false' %}
+                        <span class="badge-fake" style="font-size:0.65rem;padding:0.15rem 0.4rem;">✗</span>
+                        {% else %}
+                        <span class="badge-unverified" style="font-size:0.65rem;padding:0.15rem 0.4rem;">?</span>
+                        {% endif %}
+                    </div>
+                    <a href="/news/{{ article.pk }}/" class="art-title" style="text-decoration:none;">{{ article.title }}</a>
+                    <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--vd-silver);flex-shrink:0;">
+                        {{ article.created_at|date:"d/m/Y" }}
+                    </span>
+                    <div class="art-actions">
+                        <a href="/dashboard/article/{{ article.pk }}/edit/" class="btn-sm-vd">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="post" action="/dashboard/article/{{ article.pk }}/delete/" style="display:inline;"
+                              onsubmit="return confirm('هل تريد حذف هذا المقال؟')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-sm-vd del"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-newspaper" style="font-size:2.5rem;color:rgba(59,130,246,0.25);"></i>
+                    <p class="text-vd-silver mt-2 mb-3" style="font-size:0.9rem;">لم يتم نشر أي مقال بعد.</p>
+                    {% if user.is_journalist or user.is_staff %}
+                    <a href="/dashboard/article/new/" class="btn-vd-primary" style="font-size:0.88rem;">
+                        <i class="bi bi-plus me-1"></i>كتابة أول مقال
+                    </a>
+                    {% else %}
+                    <p class="text-vd-silver" style="font-size:0.82rem;">سجّل كصحفي لتتمكن من نشر المقالات.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- الشريط الجانبي -->
+        <div class="col-lg-4">
+            <!-- إجراءات سريعة -->
+            <div class="vd-card mb-3">
+                <div class="section-title mb-3"><i class="bi bi-lightning me-2 text-vd-accent"></i>إجراءات سريعة</div>
+                <div class="d-grid gap-2">
+                    <a href="/fact-check/" class="btn-vd-primary text-center" style="padding:0.6rem;">
+                        <i class="bi bi-shield-check me-2"></i>التحقق من معلومة
+                    </a>
+                    <a href="/news/" class="btn-vd-outline text-center" style="padding:0.6rem;">
+                        <i class="bi bi-newspaper me-2"></i>عرض الأخبار
+                    </a>
+                    <a href="/publications/" class="btn-vd-outline text-center" style="padding:0.6rem;border-color:rgba(139,92,246,0.3);color:#a78bfa;">
+                        <i class="bi bi-images me-2"></i>المنشورات المرئية
+                    </a>
+                    <a href="/accounts/profile/" class="btn-vd-outline text-center" style="padding:0.6rem;">
+                        <i class="bi bi-person-gear me-2"></i>تعديل ملفي الشخصي
+                    </a>
+                </div>
+            </div>
+
+            <!-- آخر عمليات التحقق -->
+            {% if recent_checks %}
+            <div class="vd-card">
+                <div class="section-head">
+                    <span class="section-title"><i class="bi bi-clock-history me-2 text-vd-accent"></i>تحققاتي الأخيرة</span>
+                    <a href="/fact-check/history/" class="text-vd-accent" style="font-size:0.78rem;">عرض الكل</a>
+                </div>
+                {% for check in recent_checks %}
+                <div style="padding:0.6rem 0;border-bottom:1px solid rgba(59,130,246,0.08);">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        {% if check.verdict == 'true' %}
+                        <span class="badge-verified" style="font-size:0.68rem;padding:0.15rem 0.45rem;">✓ صحيح</span>
+                        {% elif check.verdict == 'false' %}
+                        <span class="badge-fake" style="font-size:0.68rem;padding:0.15rem 0.45rem;">✗ خاطئ</span>
+                        {% else %}
+                        <span class="badge-unverified" style="font-size:0.68rem;padding:0.15rem 0.45rem;">⚠ {{ check.get_verdict_display }}</span>
+                        {% endif %}
+                        <span style="font-family:var(--font-mono);font-size:0.68rem;color:rgba(192,200,224,0.5);">{{ check.confidence_pct }}%</span>
+                    </div>
+                    <div style="font-size:0.82rem;color:var(--vd-silver);">{{ check.input_text|truncatechars:60 }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

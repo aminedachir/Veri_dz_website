@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}تسجيل الدخول — Veri_DZ{% endblock %}
+{% block extra_css %}
+<style>
+.auth-wrapper { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+.auth-card { background: var(--vd-card-bg); border: 1px solid var(--vd-border); border-radius: 10px; padding: 2.5rem; width: 100%; max-width: 440px; backdrop-filter: blur(12px); }
+.auth-title { font-family: var(--font-main); font-size: 1.8rem; font-weight: 800; color: var(--vd-white); margin-bottom: 0.3rem; }
+.auth-sub { color: var(--vd-silver); font-size: 0.92rem; margin-bottom: 1.8rem; font-family: var(--font-body); }
+.form-group { margin-bottom: 1.2rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            {% load static %}
+            <img src="{% static 'images/logo.jpeg' %}" alt="VeriDz" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--vd-bright);margin-bottom:1rem;">
+            <div class="auth-title">تسجيل الدخول</div>
+            <div class="auth-sub">ادخل إلى حسابك في VeriDz</div>
+        </div>
+
+        {% for message in messages %}
+        <div class="vd-alert vd-alert-{{ message.tags }} mb-3">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-person me-1"></i>اسم المستخدم</label>
+                <input type="text" name="username" class="vd-form-control" placeholder="اسم المستخدم" required>
+            </div>
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-lock me-1"></i>كلمة المرور</label>
+                <input type="password" name="password" class="vd-form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-vd-primary w-100 mt-2" style="padding:0.7rem;">
+                <i class="bi bi-box-arrow-in-right me-2"></i>دخول
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <span class="text-vd-silver" style="font-size:0.9rem;">ليس لديك حساب؟ </span>
+            <a href="/accounts/signup/" class="text-vd-accent" style="font-size:0.9rem;font-weight:700;">إنشاء حساب</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

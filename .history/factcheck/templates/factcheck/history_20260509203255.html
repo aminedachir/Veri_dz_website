@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}سجل التحققات — VeriDz{% endblock %}
+{% block nav_fact %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-header { padding: 3rem 0 2rem; border-bottom: 1px solid var(--vd-border); margin-bottom: 2.5rem; }
+.hist-row {
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+}
+.hist-row:hover { border-color: rgba(59,130,246,0.4); }
+
+.hist-verdict-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: 1px solid;
+}
+
+/* الألوان الجديدة للبادجات */
+.hv-trusted     { background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.35); }
+.hv-no_evidence { background:rgba(239,68,68,0.12);  color:#f87171; border-color:rgba(239,68,68,0.35); }
+.hv-conflicting { background:rgba(245,158,11,0.12); color:#fbbf24; border-color:rgba(245,158,11,0.35); }
+.hv-uncertain   { background:rgba(107,114,128,0.12);color:#9ca3af; border-color:rgba(107,114,128,0.35); }
+
+.conf-mini { font-family:var(--font-mono); font-size:0.72rem; color:var(--vd-silver); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--vd-bright);letter-spacing:2px;margin-bottom:0.5rem;">السجل</div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h1 class="vd-section-title mb-0">التحققات <span class="accent">الأخيرة</span></h1>
+            <a href="/fact-check/" class="btn-vd-primary"><i class="bi bi-plus-lg me-1"></i>تحقق جديد</a>
+        </div>
+    </div>
+
+    {% if checks %}
+    {% for check in checks %}
+    <div class="hist-row">
+        <div class="hist-verdict-badge hv-{{ check.verdict }}">
+            {% if check.verdict == 'trusted' %}✓ موثوق جداً
+            {% elif check.verdict == 'no_evidence' %}✗ لا أدلة كافية
+            {% elif check.verdict == 'conflicting' %}⚠ متعارض
+            {% else %}؟ غير مؤكد{% endif %}
+        </div>
+        <div class="flex-grow-1">
+            <div style="font-size:0.92rem;color:var(--vd-white);margin-bottom:0.4rem;">
+                {{ check.input_text|truncatechars:120 }}
+            </div>
+            <div style="font-size:0.82rem;color:rgba(192,200,224,0.7);line-height:1.5;">
+                {{ check.explanation|truncatechars:180 }}
+            </div>
+        </div>
+        <div class="text-end flex-shrink-0" style="min-width:80px;">
+            <div class="conf-mini">{{ check.confidence_pct }}% ثقة</div>
+            <div class="conf-mini mt-1">{{ check.created_at|date:"d/m/Y H:i" }}</div>
+            {% if check.user %}<div class="conf-mini mt-1" style="color:var(--vd-bright);">{{ check.user.username }}</div>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-clock-history" style="font-size:3rem;color:rgba(59,130,246,0.3);"></i>
+        <p class="text-vd-silver mt-3">لا توجد تحققات حتى الآن.</p>
+        <a href="/fact-check/" class="btn-vd-primary mt-2">ابدأ التحقق</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

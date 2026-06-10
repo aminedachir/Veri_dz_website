@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block title %}إدارة المنشورات — VeriDz{% endblock %}
+
+{% block extra_css %}
+<style>
+html, body { direction: rtl; }
+
+.manage-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--vd-border);
+    margin-bottom: 2rem;
+}
+
+.manage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.manage-table th {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--vd-silver);
+    padding: 0.75rem 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--vd-border);
+    background: rgba(139,92,246,0.05);
+}
+
+.manage-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(59,130,246,0.08);
+    vertical-align: middle;
+    color: var(--vd-white);
+}
+
+.manage-table tr:hover td { background: rgba(139,92,246,0.04); }
+
+.thumb-cell {
+    width: 52px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
+    background: rgba(139,92,246,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    overflow: hidden;
+}
+.thumb-cell img { width: 52px; height: 40px; object-fit: cover; border-radius: 5px; }
+
+.type-pill {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    padding: 0.18rem 0.5rem;
+    border-radius: 50px;
+    text-transform: uppercase;
+}
+.type-pill.image { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.type-pill.video { background: rgba(239,68,68,0.15); color: #f87171; }
+
+.status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+}
+.status-dot::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-dot.published { color: #34d399; }
+.status-dot.published::before { background: #34d399; }
+.status-dot.draft { color: var(--vd-silver); }
+.status-dot.draft::before { background: var(--vd-silver); }
+
+.btn-sm-vd {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--vd-border);
+    color: var(--vd-silver);
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-sm-vd:hover { border-color: var(--vd-bright); color: var(--vd-bright); }
+.btn-sm-vd.del { border-color: rgba(239,68,68,0.3); color: #f87171; }
+.btn-sm-vd.del:hover { background: rgba(239,68,68,0.1); }
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--vd-silver);
+}
+.empty-state i { font-size: 2.5rem; color: rgba(139,92,246,0.25); display: block; margin-bottom: 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="manage-header">
+        <a href="/dashboard/" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--vd-silver);text-decoration:none;">
+            ← العودة للوحة التحكم
+        </a>
+        <div style="font-family:var(--font-mono);font-size:0.72rem;color:#a78bfa;letter-spacing:2px;margin:0.75rem 0 0.3rem;">
+            <i class="bi bi-shield-fill me-1"></i>إدارة المحتوى
+        </div>
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+            <h1 class="vd-section-title mb-0">جميع <span class="accent">المنشورات</span></h1>
+            <div class="d-flex gap-2">
+                <a href="/publications/create/?type=image" class="btn-vd-outline" style="border-color:rgba(59,130,246,0.4);color:#60a5fa;">
+                    <i class="bi bi-image me-1"></i>صورة جديدة
+                </a>
+                <a href="/publications/create/?type=video" class="btn-vd-primary">
+                    <i class="bi bi-camera-video me-1"></i>فيديو جديد
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="vd-card" style="padding:0;overflow:hidden;">
+        {% if publications %}
+        <table class="manage-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>العنوان</th>
+                    <th>النوع</th>
+                    <th>الحالة</th>
+                    <th>المشاهدات</th>
+                    <th>التاريخ</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pub in publications %}
+                <tr>
+                    <td>
+                        <div class="thumb-cell">
+                            {% if pub.pub_type == 'image' and pub.image %}
+                                <img src="{{ pub.image.url }}" alt="">
+                            {% elif pub.pub_type == 'video' and pub.thumbnail %}
+                                <img src="{{ pub.thumbnail.url }}" alt="">
+                            {% elif pub.pub_type == 'video' %}
+                                🎬
+                            {% else %}
+                                🖼
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="/publications/{{ pub.pk }}/" style="color:var(--vd-white);text-decoration:none;font-weight:600;">
+                            {{ pub.title|truncatechars:45 }}
+                        </a>
+                    </td>
+                    <td><span class="type-pill {{ pub.pub_type }}">{% if pub.pub_type == 'image' %}صورة{% else %}فيديو{% endif %}</span></td>
+                    <td>
+                        <span class="status-dot {% if pub.is_published %}published{% else %}draft{% endif %}">
+                            {% if pub.is_published %}منشور{% else %}مسودة{% endif %}
+                        </span>
+                    </td>
+                    <td style="font-family:var(--font-mono);font-size:0.8rem;color:var(--vd-silver);">{{ pub.views_count }}</td>
+                    <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--vd-silver);">{{ pub.created_at|date:"d/m/Y" }}</td>
+                    <td>
+                        <div style="display:flex;gap:0.4rem;">
+                            <a href="/publications/{{ pub.pk }}/edit/" class="btn-sm-vd">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="post" action="/publications/{{ pub.pk }}/delete/" style="display:inline;"
+                                  onsubmit="return confirm('حذف هذا المنشور نهائياً؟')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm-vd del"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-images"></i>
+            <h4 style="color:var(--vd-white);font-family:var(--font-head);">لا توجد منشورات</h4>
+            <p style="font-size:0.85rem;margin-bottom:1rem;">ابدأ بنشر أول صورة أو فيديو</p>
+            <a href="/publications/create/" class="btn-vd-primary">
+                <i class="bi bi-plus me-1"></i>منشور جديد
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

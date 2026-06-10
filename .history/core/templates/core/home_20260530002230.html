@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Veri_DZ  — الرئيسية{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero-eyebrow {
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    color: var(--vd-bright);
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.hero-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--vd-bright);
+}
+.hero-title {
+    font-family: var(--font-main);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--vd-white);
+    margin-bottom: 1.2rem;
+}
+.hero-title .highlight {
+    color: var(--vd-bright);
+    text-shadow: 0 0 30px rgba(59,130,246,0.5);
+}
+.hero-desc {
+    font-size: 1.05rem;
+    color: var(--vd-silver);
+    line-height: 1.9;
+    max-width: 500px;
+    margin-bottom: 2rem;
+    font-family: var(--font-body);
+}
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--vd-border);
+}
+.stat-item .stat-num {
+    font-family: var(--font-main);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--vd-bright);
+}
+.stat-item .stat-label {
+    font-size: 0.82rem;
+    color: var(--vd-silver);
+    font-family: var(--font-body);
+}
+.logo-hero {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(59,130,246,0.4);
+    box-shadow: 0 0 40px rgba(37,99,235,0.4), 0 0 80px rgba(37,99,235,0.2);
+    animation: logoPulse 4s ease-in-out infinite;
+}
+@keyframes logoPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(37,99,235,0.4), 0 0 80px rgba(37,99,235,0.2); }
+    50%       { box-shadow: 0 0 60px rgba(59,130,246,0.6), 0 0 120px rgba(37,99,235,0.3); }
+}
+.orbit-ring {
+    position: absolute;
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 50%;
+    animation: orbit 20s linear infinite;
+}
+.orbit-ring-1 { width: 390px; height: 390px; top: -35px; left: -35px; }
+.orbit-ring-2 { width: 460px; height: 460px; top: -70px; left: -70px; animation-duration: 30s; animation-direction: reverse; }
+@keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.hero-visual { position: relative; display: inline-block; }
+
+.mission-icon {
+    width: 56px; height: 56px;
+    background: rgba(37,99,235,0.15);
+    border: 1px solid var(--vd-border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    color: var(--vd-bright);
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+.mission-card:hover .mission-icon {
+    background: rgba(37,99,235,0.3);
+    box-shadow: 0 0 20px rgba(37,99,235,0.4);
+}
+
+.news-card-link { text-decoration: none; color: inherit; }
+.news-card-link:hover .vd-card { border-color: rgba(59,130,246,0.5); }
+.news-meta { font-family: var(--font-body); font-size: 0.78rem; color: var(--vd-silver); }
+.news-title-card {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--vd-white);
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+.cta-section {
+    background: linear-gradient(135deg, rgba(26,58,143,0.3), rgba(37,99,235,0.15));
+    border: 1px solid var(--vd-border);
+    border-radius: 12px;
+    padding: 3.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- البطل -->
+<section class="hero-section container">
+    <div class="row align-items-center g-5 w-100">
+        <div class="col-lg-6">
+            <div class="hero-eyebrow">المنصة الجزائرية للتحقق من الأخبار</div>
+            <h1 class="hero-title">
+                <span class="highlight">الحقيقة</span> في مواجهة<br>
+                <span class="highlight">المعلومات المضللة</span>
+            </h1>
+            <p class="hero-desc">
+                 Veri_DZ تكتشف الأخبار الزائفة، تتحقق من المقالات الصحفية،
+                وتحمي المعلومات في الجزائر بفضل الذكاء الاصطناعي.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="/fact-check/" class="btn-vd-primary" style="font-size:1.05rem; padding:0.7rem 2rem;">
+                    <i class="bi bi-shield-check me-2"></i>تحقق من خبر
+                </a>
+                <a href="/accounts/signup/" class="btn-vd-outline" style="font-size:1.05rem; padding:0.7rem 2rem;">
+                    <i class="bi bi-pencil-square me-2"></i>انضم إلينا
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-num">+2400</div>
+                    <div class="stat-label">مقال تم التحقق منه</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">97%</div>
+                    <div class="stat-label">دقة الذكاء الاصطناعي</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">+150</div>
+                    <div class="stat-label">صحفي معتمد</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex justify-content-center">
+            <div class="hero-visual">
+                <div class="orbit-ring orbit-ring-1"></div>
+                <div class="orbit-ring orbit-ring-2"></div>
+                <img src="{% static 'images/logo.jpeg' %}" alt="VeriDz" class="logo-hero">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- مهمتنا -->
+<section class="container py-5 mt-3">
+    <div class="text-center mb-5">
+        <div class="hero-eyebrow justify-content-center">مهمتنا</div>
+        <h2 class="vd-section-title">لماذا <span class="accent"> Veri_DZ</span>؟</h2>
+        <hr class="vd-divider mx-auto" style="background: linear-gradient(90deg, transparent, var(--vd-bright));">
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="vd-card mission-card h-100">
+                <div class="mission-icon"><i class="bi bi-robot"></i></div>
+                <h5 class="vd-card-title">كشف بالذكاء الاصطناعي</h5>
+                <p class="text-vd-silver" style="font-size:0.92rem;line-height:1.8;">
+                    يحلل ذكاؤنا الاصطناعي النصوص والروابط للكشف عن المعلومات الزائفة بدقة عالية.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="vd-card mission-card h-100">
+                <div class="mission-icon"><i class="bi bi-people"></i></div>
+                <h5 class="vd-card-title">صحفيون معتمدون</h5>
+                <p class="text-vd-silver" style="font-size:0.92rem;line-height:1.8;">
+                    شبكة من الصحفيين المعتمدين ينشرون ويتحققون من المعلومات على منصتنا.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="vd-card mission-card h-100">
+                <div class="mission-icon"><i class="bi bi-bar-chart"></i></div>
+                <h5 class="vd-card-title">نقاط المصداقية</h5>
+                <p class="text-vd-silver" style="font-size:0.92rem;line-height:1.8;">
+                    كل تحليل يعطي نقاط ثقة مفصلة تساعد المواطنين على الحصول على معلومات دقيقة.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- أحدث الأخبار -->
+{% if featured or latest %}
+<section class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="vd-section-title mb-0">أخبار <span class="accent">محققة</span></h2>
+            <hr class="vd-divider mb-0">
+        </div>
+        <a href="/news/" class="btn-vd-outline" style="font-size:0.88rem;">عرض الكل <i class="bi bi-arrow-left ms-1"></i></a>
+    </div>
+    <div class="row g-3">
+        {% for article in featured %}
+        <div class="col-md-4">
+            <a href="/news/{{ article.pk }}/" class="news-card-link">
+                <div class="vd-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge-verified"><i class="bi bi-check-circle me-1"></i>محقق</span>
+                        <span class="news-meta">{{ article.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <h6 class="news-title-card">{{ article.title }}</h6>
+                    <p class="text-vd-silver" style="font-size:0.85rem;">{{ article.content|truncatechars:100 }}</p>
+                    <div class="news-meta mt-2">
+                        <i class="bi bi-person me-1"></i>{{ article.author.username }}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        {% for article in latest %}
+        <div class="col-md-4">
+            <a href="/news/{{ article.pk }}/" class="news-card-link">
+                <div class="vd-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge-unverified">قيد الانتظار</span>
+                        <span class="news-meta">{{ article.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <h6 class="news-title-card">{{ article.title }}</h6>
+                    <p class="text-vd-silver" style="font-size:0.85rem;">{{ article.content|truncatechars:100 }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- دعوة للعمل -->
+<section class="container py-5">
+    <div class="cta-section">
+        <div class="hero-eyebrow justify-content-center mb-3">انضم إلينا</div>
+        <h2 class="vd-section-title mb-2">هل أنت <span class="accent">صحفي</span>؟</h2>
+        <p class="text-vd-silver mb-4" style="max-width:500px;margin:0 auto 1.5rem;font-family:var(--font-body);line-height:1.9;">
+            انضم إلى شبكتنا، انشر مقالاتك وشارك في مكافحة التضليل الإعلامي في الجزائر.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/accounts/signup/" class="btn-vd-primary" style="font-size:1.05rem; padding:0.7rem 2.2rem;">
+                <i class="bi bi-person-plus me-2"></i>التسجيل كصحفي
+            </a>
+            <a href="/fact-check/" class="btn-vd-outline" style="font-size:1.05rem; padding:0.7rem 2.2rem;">
+                <i class="bi bi-search me-2"></i>تجربة التحقق
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

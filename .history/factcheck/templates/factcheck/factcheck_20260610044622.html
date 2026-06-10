@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% block title %}التحقق من الأخبار— Veri_DZ{% endblock %}
+{% block nav_fact %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+.fc-header { padding: 3rem 0 2rem; border-bottom: 1px solid var(--vd-border); margin-bottom: 2.5rem; }
+.fc-input-panel { background: var(--vd-card-bg); border: 1px solid var(--vd-border); border-radius: 10px; padding: 2rem; backdrop-filter: blur(10px); margin-bottom: 2rem; }
+.fc-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--vd-border); padding-bottom: 1rem; }
+.fc-tab { font-family: var(--font-main); font-size: 0.95rem; padding: 0.4rem 1.1rem; border-radius: 4px; border: 1px solid transparent; color: var(--vd-silver); cursor: pointer; transition: all 0.2s; background: transparent; font-weight: 600; }
+.fc-tab.active, .fc-tab:hover { color: var(--vd-bright); border-color: var(--vd-border); background: rgba(59,130,246,0.08); }
+.fc-textarea { min-height: 150px; resize: vertical; }
+.char-count { font-family: var(--font-body); font-size: 0.78rem; color: var(--vd-silver); text-align: left; margin-top: 0.3rem; }
+
+/* ── بطاقة النتيجة ── */
+.result-card { border-radius: 10px; padding: 2rem; border: 1px solid; margin-bottom: 2rem; animation: fadeUp 0.4s ease; backdrop-filter: blur(10px); }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+.result-card.trusted     { background:rgba(16,185,129,0.07); border-color:rgba(16,185,129,0.4); }
+.result-card.no_evidence { background:rgba(239,68,68,0.07);  border-color:rgba(239,68,68,0.4); }
+.result-card.uncertain   { background:rgba(107,114,128,0.07);border-color:rgba(107,114,128,0.4); }
+.result-card.conflicting { background:rgba(245,158,11,0.07); border-color:rgba(245,158,11,0.4); }
+
+/* ── أيقونة الحكم ── */
+.verdict-icon { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:1rem; }
+.verdict-icon.trusted     { background:rgba(16,185,129,0.15); color:#10b981; }
+.verdict-icon.no_evidence { background:rgba(239,68,68,0.15);  color:#ef4444; }
+.verdict-icon.uncertain   { background:rgba(107,114,128,0.15);color:#6b7280; }
+.verdict-icon.conflicting { background:rgba(245,158,11,0.15); color:#f59e0b; }
+
+/* ── عنوان الحكم ── */
+.verdict-title { font-family:var(--font-main); font-size:2rem; font-weight:800; }
+.verdict-title.trusted     { color:#34d399; }
+.verdict-title.no_evidence { color:#f87171; }
+.verdict-title.uncertain   { color:#9ca3af; }
+.verdict-title.conflicting { color:#fbbf24; }
+
+/* ── شريط الثقة ── */
+.conf-bar-wrap { background:rgba(255,255,255,0.06); border-radius:4px; height:8px; overflow:hidden; margin:0.6rem 0 0.3rem; }
+.conf-bar { height:100%; border-radius:4px; transition:width 1s ease; }
+.conf-bar.trusted     { background:linear-gradient(270deg,#10b981,#34d399); }
+.conf-bar.no_evidence { background:linear-gradient(270deg,#ef4444,#f87171); }
+.conf-bar.uncertain   { background:linear-gradient(270deg,#6b7280,#9ca3af); }
+.conf-bar.conflicting { background:linear-gradient(270deg,#f59e0b,#fbbf24); }
+
+.detail-section { background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:1rem 1.2rem; margin-top:1rem; }
+.detail-label { font-family:var(--font-body); font-size:0.75rem; color:var(--vd-bright); letter-spacing:1px; margin-bottom:0.5rem; }
+.tag-pill { display:inline-block; background:rgba(59,130,246,0.1); border:1px solid var(--vd-border); border-radius:20px; padding:0.2rem 0.8rem; font-size:0.82rem; color:var(--vd-silver); margin:0.2rem; font-family:var(--font-body); }
+.tag-pill.red { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#f87171; }
+
+.recent-row { display:flex; align-items:center; gap:1rem; padding:0.7rem 0; border-bottom:1px solid var(--vd-border); }
+.recent-row:last-child { border-bottom:none; }
+.mini-badge { font-family:var(--font-main); font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:3px; white-space:nowrap; flex-shrink:0; }
+
+.analyzing-spinner { display:none; align-items:center; gap:0.8rem; color:var(--vd-bright); font-family:var(--font-body); font-size:0.9rem; margin-top:1rem; }
+.spinner-ring { width:20px; height:20px; border:2px solid rgba(59,130,246,0.2); border-top-color:var(--vd-bright); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="fc-header">
+        <div style="font-family:var(--font-body);font-size:0.82rem;color:var(--vd-bright);letter-spacing:1px;margin-bottom:0.5rem;">التحقق من الأخبار</div>
+        <h1 class="vd-section-title mb-1">كاشف <span class="accent">الأخبار الزائفة</span></h1>
+        <p class="text-vd-silver" style="max-width:560px;font-family:var(--font-body);line-height:1.9;">
+            أرسل نصاً أو رابطاً — سيحلل ذكاؤنا الاصطناعي المصداقية ويكشف علامات التضليل.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="fc-input-panel">
+                <div class="fc-tabs">
+                    <button class="fc-tab" id="tab-text" onclick="switchTab('text', this)">
+                        <i class="bi bi-textarea-t me-1"></i>نص
+                    </button>
+                    <button class="fc-tab" id="tab-url" onclick="switchTab('url', this)">
+                        <i class="bi bi-link-45deg me-1"></i>رابط
+                    </button>
+                </div>
+
+                {% if error %}
+                <div class="vd-alert vd-alert-danger mb-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+
+                <form method="post" id="fc-form" onsubmit="onSubmit()">
+                    {% csrf_token %}
+                    <div id="text-panel">
+                        <label class="vd-label"><i class="bi bi-textarea-t me-1"></i>الصق النص المراد تحليله</label>
+                        <textarea name="text" id="fc-text" class="vd-form-control fc-textarea"
+                                  placeholder="انسخ هنا نص الخبر أو المقال الذي تريد التحقق منه…">{{ input_text }}</textarea>
+                        <div class="char-count"><span id="char-count">0</span> حرف</div>
+                    </div>
+
+                    <div id="url-panel" style="display:none;">
+                        <label class="vd-label"><i class="bi bi-link-45deg me-1"></i>رابط المقال</label>
+                        <input type="url" name="url" id="fc-url" class="vd-form-control"
+                               placeholder="https://…" value="{{ input_url }}">
+                        <div class="char-count mt-2" style="text-align:right;color:rgba(192,200,224,0.5);font-family:var(--font-body);">
+                            <i class="bi bi-info-circle me-1"></i>سيقوم الذكاء الاصطناعي بقراءة محتوى الرابط وتحليله.
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mt-3 flex-wrap">
+                        <button type="submit" class="btn-vd-primary" style="padding:0.65rem 2rem;" id="submit-btn">
+                            <i class="bi bi-robot me-2"></i>تحليل بالذكاء الاصطناعي
+                        </button>
+                        <button type="button" onclick="clearForm()" class="btn-vd-outline" style="padding:0.65rem 1.2rem;">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>إعادة تعيين
+                        </button>
+                        <div class="analyzing-spinner" id="spinner">
+                            <div class="spinner-ring"></div>
+                            <span>جارٍ التحليل…</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ── النتيجة ── -->
+            {% if result %}
+            <div class="result-card {{ result.verdict }}">
+                <div class="row g-4 align-items-start">
+                    <div class="col-sm-auto">
+                        <div class="verdict-icon {{ result.verdict }}">
+                            {% if result.verdict == 'trusted' %}<i class="bi bi-patch-check-fill"></i>
+                            {% elif result.verdict == 'no_evidence' %}<i class="bi bi-x-circle-fill"></i>
+                            {% elif result.verdict == 'conflicting' %}<i class="bi bi-exclamation-triangle-fill"></i>
+                            {% else %}<i class="bi bi-question-circle-fill"></i>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="verdict-title {{ result.verdict }}">
+                            {% if result.verdict == 'trusted' %}✓ موثوق جداً
+                            {% elif result.verdict == 'no_evidence' %}✗ لا يوجد أدلة كافية
+                            {% elif result.verdict == 'conflicting' %}⚠ مصادر متعارضة
+                            {% else %}؟ غير مؤكد{% endif %}
+                        </div>
+                        <div style="font-family:var(--font-body);font-size:0.85rem;color:var(--vd-silver);margin-top:0.5rem;">
+                            مستوى الثقة: <strong style="color:var(--vd-white);">{{ result.confidence_pct }}%</strong>
+                        </div>
+                        <div class="conf-bar-wrap">
+                            <div class="conf-bar {{ result.verdict }}" style="width:{{ result.confidence_pct }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section mt-3">
+                    <div class="detail-label"><i class="bi bi-chat-text me-1"></i>التحليل</div>
+                    <p style="font-size:0.92rem;line-height:1.9;margin:0;color:rgba(232,238,255,0.9);font-family:var(--font-body);">{{ result.explanation }}</p>
+                </div>
+
+                {% if result_data.key_claims_list %}
+                <div class="detail-section">
+                    <div class="detail-label"><i class="bi bi-list-check me-1"></i>الادعاءات الرئيسية</div>
+                    {% for claim in result_data.key_claims_list %}
+                    <span class="tag-pill">{{ claim }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if result_data.red_flags_list %}
+                <div class="detail-section">
+                    <div class="detail-label" style="color:#f87171;"><i class="bi bi-flag me-1"></i>علامات التحذير</div>
+                    {% for flag in result_data.red_flags_list %}
+                    <span class="tag-pill red">⚠ {{ flag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if result_data.sources_list %}
+                <div class="detail-section">
+                    <div class="detail-label"><i class="bi bi-book me-1"></i>المصادر الموصى بها</div>
+                    {% for src in result_data.sources_list %}
+                    <span class="tag-pill">{{ src }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mt-3 d-flex gap-2 flex-wrap">
+                    <a href="/fact-check/" class="btn-vd-outline" style="font-size:0.88rem;padding:0.4rem 1rem;">
+                        <i class="bi bi-arrow-right me-1"></i>تحليل جديد
+                    </a>
+                    <a href="/fact-check/history/" class="btn-vd-outline" style="font-size:0.88rem;padding:0.4rem 1rem;">
+                        <i class="bi bi-clock-history me-1"></i>السجل
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ── الشريط الجانبي ── -->
+        <div class="col-lg-4">
+            <div class="vd-card mb-3">
+                <div class="vd-card-title mb-3"><i class="bi bi-lightbulb me-2 text-vd-accent"></i>كيف يعمل؟</div>
+                <div style="font-size:0.9rem;color:var(--vd-silver);line-height:1.9;font-family:var(--font-body);">
+                    <div class="d-flex gap-2 mb-2"><span class="text-vd-accent font-main" style="font-weight:700;">١.</span><span>الصق النص أو الرابط المراد تحقيقه</span></div>
+                    <div class="d-flex gap-2 mb-2"><span class="text-vd-accent font-main" style="font-weight:700;">٢.</span><span>يقوم ذكاؤنا الاصطناعي بتحليل المحتوى</span></div>
+                    <div class="d-flex gap-2 mb-2"><span class="text-vd-accent font-main" style="font-weight:700;">٣.</span><span>احصل على حكم ونقاط ثقة مفصلة</span></div>
+                    <div class="d-flex gap-2"><span class="text-vd-accent font-main" style="font-weight:700;">٤.</span><span>راجع المصادر الموصى بها</span></div>
+                </div>
+            </div>
+
+            <div class="vd-card mb-3">
+                <div class="vd-card-title mb-3"><i class="bi bi-info-circle me-2 text-vd-accent"></i>معنى الأحكام</div>
+                <div style="font-size:0.85rem;font-family:var(--font-body);">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#34d399;">✓</span>
+                        <div><strong style="color:#34d399;">موثوق جداً</strong> <span class="text-vd-silver">— معلومة محققة ودقيقة</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#f87171;">✗</span>
+                        <div><strong style="color:#f87171;">لا يوجد أدلة كافية</strong> <span class="text-vd-silver">— لا توجد أدلة تدعم الادعاء</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#fbbf24;">⚠</span>
+                        <div><strong style="color:#fbbf24;">مصادر متعارضة</strong> <span class="text-vd-silver">— المصادر تتناقض حول الادعاء</span></div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span style="color:#9ca3af;">?</span>
+                        <div><strong style="color:#9ca3af;">غير مؤكد</strong> <span class="text-vd-silver">— يصعب الجزم بصحته أو خطئه</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {% if recent_checks %}
+            <div class="vd-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="vd-card-title"><i class="bi bi-clock-history me-2 text-vd-accent"></i>آخر التحققات</div>
+                    <a href="/fact-check/history/" class="text-vd-accent" style="font-size:0.8rem;">عرض الكل</a>
+                </div>
+                {% for check in recent_checks %}
+                <div class="recent-row">
+                    <span class="mini-badge
+                        {% if check.verdict == 'trusted' %}badge-verified
+                        {% elif check.verdict == 'no_evidence' %}badge-fake
+                        {% else %}badge-unverified{% endif %}">
+                        {% if check.verdict == 'trusted' %}✓ موثوق جداً
+                        {% elif check.verdict == 'no_evidence' %}✗ لا أدلة
+                        {% elif check.verdict == 'conflicting' %}⚠ متعارض
+                        {% else %}؟ غير مؤكد{% endif %}
+                    </span>
+                    <span style="font-size:0.83rem;color:var(--vd-silver);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-body);">
+                        {{ check.input_text|truncatechars:50 }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let activeTab = 'text';
+
+function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.fc-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('text-panel').style.display = tab === 'text' ? 'block' : 'none';
+    document.getElementById('url-panel').style.display  = tab === 'url'  ? 'block' : 'none';
+}
+
+(function restoreTab() {
+    const inputUrl  = "{{ input_url|escapejs }}";
+    const inputText = "{{ input_text|escapejs }}";
+    if (inputUrl && !inputText) {
+        switchTab('url', document.getElementById('tab-url'));
+    } else {
+        switchTab('text', document.getElementById('tab-text'));
+    }
+})();
+
+const textarea = document.getElementById('fc-text');
+const counter  = document.getElementById('char-count');
+if (textarea) {
+    textarea.addEventListener('input', () => counter.textContent = textarea.value.length);
+    counter.textContent = textarea.value.length;
+}
+
+function clearForm() {
+    if (textarea) textarea.value = '';
+    const urlInput = document.getElementById('fc-url');
+    if (urlInput) urlInput.value = '';
+    if (counter) counter.textContent = '0';
+}
+
+function onSubmit() {
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').innerHTML = '<i class="bi bi-hourglass-split me-2"></i>جارٍ التحليل…';
+    document.getElementById('spinner').style.display = 'flex';
+}
+
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-robot me-2"></i>تحليل بالذكاء الاصطناعي';
+        document.getElementById('spinner').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
