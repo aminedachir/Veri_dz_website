@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if LANGUAGE == 'ar' %}إنشاء حساب — Veri_DZ
+    {% elif LANGUAGE == 'fr' %}Inscription — Veri_DZ
+    {% else %}Sign Up — Veri_DZ{% endif %}
+{% endblock %}
+{% block extra_css %}
+<style>
+.auth-wrapper { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+.auth-card { background: var(--vd-card-bg); border: 1px solid var(--vd-border); border-radius: 10px; padding: 2.5rem; width: 100%; max-width: 550px; backdrop-filter: blur(12px); }
+.auth-title { font-family: var(--font-main); font-size: 1.8rem; font-weight: 800; color: var(--vd-white); margin-bottom: 0.3rem; }
+.auth-sub { color: var(--vd-silver); font-size: 0.92rem; margin-bottom: 1.8rem; font-family: var(--font-body); }
+.form-group { margin-bottom: 1.1rem; }
+.journalist-toggle, .media-toggle { 
+    background: rgba(37,99,235,0.08); 
+    border: 1px solid var(--vd-border); 
+    border-radius: 6px; 
+    padding: 0.9rem 1rem; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.75rem; 
+    cursor: pointer; 
+    margin-bottom: 0.75rem;
+}
+.journalist-toggle input[type=checkbox], .media-toggle input[type=checkbox] { 
+    width: 18px; 
+    height: 18px; 
+    accent-color: var(--vd-bright); 
+    flex-shrink: 0; 
+}
+.media-toggle {
+    background: rgba(139,92,246,0.08);
+    border-color: rgba(139,92,246,0.3);
+}
+.media-toggle input[type=checkbox] {
+    accent-color: #a78bfa;
+}
+#id_username, #id_email, #id_password1, #id_password2, #id_organization {
+    background: rgba(10,15,46,0.7) !important;
+    border: 1px solid var(--vd-border) !important;
+    color: var(--vd-white) !important;
+    font-family: var(--font-body) !important;
+    border-radius: 4px !important;
+    padding: 0.65rem 1rem !important;
+    width: 100% !important;
+    text-align: right !important;
+}
+#id_username:focus, #id_email:focus, #id_password1:focus, #id_password2:focus, #id_organization:focus {
+    outline: none !important;
+    border-color: var(--vd-bright) !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+    background: rgba(10,15,46,0.9) !important;
+    color: var(--vd-white) !important;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            {% load static %}
+            <img src="{% static 'images/logo.jpeg' %}" alt="VeriDz" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--vd-bright);margin-bottom:1rem;">
+            <div class="auth-title">
+                {% if LANGUAGE == 'ar' %}إنشاء حساب جديد
+                {% elif LANGUAGE == 'fr' %}Créer un nouveau compte
+                {% else %}Create New Account{% endif %}
+            </div>
+            <div class="auth-sub">
+                {% if LANGUAGE == 'ar' %}انضم إلى مجتمع فيري_دي زد
+                {% elif LANGUAGE == 'fr' %}Rejoignez la communauté Veri_DZ
+                {% else %}Join the Veri_DZ community{% endif %}
+            </div>
+        </div>
+
+        {% for message in messages %}
+        <div class="vd-alert vd-alert-danger mb-3">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                {% if field.name == 'is_journalist' %}
+                <label class="journalist-toggle w-100">
+                    {{ field }}
+                    <div>
+                        <div class="vd-label mb-0" style="cursor:pointer;"><i class="bi bi-newspaper me-1"></i>
+                            {% if LANGUAGE == 'ar' %}أنا صحفي
+                            {% elif LANGUAGE == 'fr' %}Je suis journaliste
+                            {% else %}I'm a journalist{% endif %}
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--vd-silver);">
+                            {% if LANGUAGE == 'ar' %}الوصول إلى ميزات النشر والتحقق
+                            {% elif LANGUAGE == 'fr' %}Accès aux fonctionnalités de publication et de vérification
+                            {% else %}Access to publishing and verification features{% endif %}
+                        </div>
+                    </div>
+                </label>
+                {% elif field.name == 'is_media_organization' %}
+                <label class="media-toggle w-100">
+                    {{ field }}
+                    <div>
+                        <div class="vd-label mb-0" style="cursor:pointer;"><i class="bi bi-building me-1"></i>
+                            {% if LANGUAGE == 'ar' %}مؤسسة إعلامية / صحيفة
+                            {% elif LANGUAGE == 'fr' %}Organisation médiatique / Journal
+                            {% else %}Media Organization / Newspaper{% endif %}
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--vd-silver);">
+                            {% if LANGUAGE == 'ar' %}تسجيل مؤسستك الإعلامية للتحقق من الأخبار
+                            {% elif LANGUAGE == 'fr' %}Inscrivez votre organisation médiatique pour vérifier les actualités
+                            {% else %}Register your media organization for news verification{% endif %}
+                        </div>
+                    </div>
+                </label>
+                {% else %}
+                <label class="vd-label">
+                    {% if field.name == 'username' %}
+                        {% if LANGUAGE == 'ar' %}اسم المستخدم
+                        {% elif LANGUAGE == 'fr' %}Nom d'utilisateur
+                        {% else %}Username{% endif %}
+                    {% elif field.name == 'email' %}
+                        {% if LANGUAGE == 'ar' %}البريد الإلكتروني
+                        {% elif LANGUAGE == 'fr' %}Adresse e-mail
+                        {% else %}Email Address{% endif %}
+                    {% elif field.name == 'password1' %}
+                        {% if LANGUAGE == 'ar' %}كلمة المرور
+                        {% elif LANGUAGE == 'fr' %}Mot de passe
+                        {% else %}Password{% endif %}
+                    {% elif field.name == 'password2' %}
+                        {% if LANGUAGE == 'ar' %}تأكيد كلمة المرور
+                        {% elif LANGUAGE == 'fr' %}Confirmer le mot de passe
+                        {% else %}Confirm Password{% endif %}
+                    {% elif field.name == 'organization' %}
+                        {% if LANGUAGE == 'ar' %}المؤسسة / الجريدة
+                        {% elif LANGUAGE == 'fr' %}Organisation / Journal
+                        {% else %}Organization / Newspaper{% endif %}
+                    {% else %}{{ field.label }}{% endif %}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <div style="color:#f87171;font-size:0.82rem;margin-top:0.3rem;">{{ field.errors.0 }}</div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-vd-primary w-100 mt-2" style="padding:0.7rem;">
+                <i class="bi bi-person-plus me-2"></i>
+                {% if LANGUAGE == 'ar' %}إنشاء الحساب
+                {% elif LANGUAGE == 'fr' %}Créer le compte
+                {% else %}Create Account{% endif %}
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <span class="text-vd-silver" style="font-size:0.9rem;">
+                {% if LANGUAGE == 'ar' %}لديك حساب بالفعل؟ 
+                {% elif LANGUAGE == 'fr' %}Vous avez déjà un compte ? 
+                {% else %}Already have an account? {% endif %}
+            </span>
+            <a href="/accounts/login/" class="text-vd-accent" style="font-size:0.9rem;font-weight:700;">
+                {% if LANGUAGE == 'ar' %}تسجيل الدخول
+                {% elif LANGUAGE == 'fr' %}Connexion
+                {% else %}Login{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

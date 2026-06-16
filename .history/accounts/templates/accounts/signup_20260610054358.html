@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if LANGUAGE == 'ar' %}إنشاء حساب — Veri_DZ
+    {% elif LANGUAGE == 'fr' %}Inscription — Veri_DZ
+    {% else %}Sign Up — Veri_DZ{% endif %}
+{% endblock %}
+{% block extra_css %}
+<style>
+.auth-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, rgba(6,12,31,0.95), rgba(10,15,46,0.98));
+}
+.auth-card {
+    background: var(--vd-card-bg);
+    border: 1px solid var(--vd-border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 580px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.1);
+}
+.auth-title {
+    font-family: var(--font-main);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--vd-white);
+    margin-bottom: 0.3rem;
+}
+.auth-sub {
+    color: var(--vd-silver);
+    font-size: 0.92rem;
+    margin-bottom: 1.8rem;
+    font-family: var(--font-body);
+}
+.form-group {
+    margin-bottom: 1.1rem;
+}
+/* Account Type Selector - Beautiful Cards */
+.account-type-section {
+    margin-bottom: 1.8rem;
+}
+.section-label {
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--vd-silver);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+.account-type-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+.account-type-card {
+    position: relative;
+    cursor: pointer;
+}
+.account-type-card input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.card-content {
+    background: rgba(10,15,46,0.6);
+    border: 1.5px solid var(--vd-border);
+    border-radius: 12px;
+    padding: 1.2rem 0.75rem;
+    text-align: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+.card-content i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.6rem;
+}
+.card-content .card-title {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.card-content .card-desc {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--vd-silver);
+    line-height: 1.4;
+}
+/* Journalist Card */
+.account-type-card.journalist .card-content i { color: #34d399; }
+.account-type-card.journalist input:checked + .card-content {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,95,70,0.1));
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16,185,129,0.3);
+    transform: translateY(-2px);
+}
+/* Media Organization Card */
+.account-type-card.media .card-content i { color: #a78bfa; }
+.account-type-card.media input:checked + .card-content {
+    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(109,40,217,0.1));
+    border-color: #8b5cf6;
+    box-shadow: 0 0 20px rgba(139,92,246,0.3);
+    transform: translateY(-2px);
+}
+/* No selection card - regular user */
+.account-type-card.none .card-content i { color: #60a5fa; }
+.account-type-card.none input:checked + .card-content {
+    background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.1));
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59,130,246,0.3);
+    transform: translateY(-2px);
+}
+/* Organization Field - shows when media org selected */
+.organization-field {
+    display: none;
+    animation: fadeInUp 0.3s ease;
+}
+.organization-field.visible {
+    display: block;
+}
+.note-text {
+    font-size: 0.72rem;
+    color: var(--vd-silver);
+    text-align: center;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--vd-border);
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Form Fields */
+#id_username, #id_email, #id_password1, #id_password2, #id_organization {
+    background: rgba(10,15,46,0.7) !important;
+    border: 1px solid var(--vd-border) !important;
+    color: var(--vd-white) !important;
+    font-family: var(--font-body) !important;
+    border-radius: 8px !important;
+    padding: 0.7rem 1rem !important;
+    width: 100% !important;
+    text-align: right !important;
+    transition: all 0.2s ease !important;
+}
+#id_username:focus, #id_email:focus, #id_password1:focus, #id_password2:focus, #id_organization:focus {
+    outline: none !important;
+    border-color: var(--vd-bright) !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+    background: rgba(10,15,46,0.9) !important;
+}
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 0.4rem;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.strength-bar {
+    width: 0%;
+    height: 100%;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+.strength-bar.weak { width: 25%; background: #ef4444; }
+.strength-bar.medium { width: 50%; background: #f59e0b; }
+.strength-bar.strong { width: 75%; background: #10b981; }
+.strength-bar.very-strong { width: 100%; background: #34d399; }
+.strength-text {
+    font-size: 0.68rem;
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+}
+/* Submit Button */
+.submit-btn {
+    background: linear-gradient(135deg, var(--vd-accent), var(--vd-bright));
+    color: #fff;
+    border: none;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.75rem;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 0.5rem;
+    transition: all 0.25s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(59,130,246,0.4);
+}
+.submit-btn:active {
+    transform: translateY(0);
+}
+/* Login Link */
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--vd-border);
+}
+@media (max-width: 500px) {
+    .auth-card { padding: 1.5rem; }
+    .account-type-cards { gap: 0.75rem; }
+    .card-content { padding: 0.9rem 0.5rem; }
+    .card-content i { font-size: 1.6rem; }
+    .card-content .card-title { font-size: 0.85rem; }
+    .card-content .card-desc { font-size: 0.65rem; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            {% load static %}
+            <img src="{% static 'images/logo.jpeg' %}" alt="VeriDz" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--vd-bright);margin-bottom:1rem;box-shadow:0 0 20px rgba(59,130,246,0.3);">
+            <div class="auth-title">
+                {% if LANGUAGE == 'ar' %}إنشاء حساب جديد
+                {% elif LANGUAGE == 'fr' %}Créer un nouveau compte
+                {% else %}Create New Account{% endif %}
+            </div>
+            <div class="auth-sub">
+                {% if LANGUAGE == 'ar' %}انضم إلى مجتمع فيري_دي زد
+                {% elif LANGUAGE == 'fr' %}Rejoignez la communauté Veri_DZ
+                {% else %}Join the Veri_DZ community{% endif %}
+            </div>
+        </div>
+
+        {% for message in messages %}
+        <div class="vd-alert vd-alert-danger mb-3">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" id="signupForm">
+            {% csrf_token %}
+            
+            <!-- Account Type Selection - Beautiful Cards (No Reader Option) -->
+            <div class="account-type-section">
+                <label class="section-label">
+                    <i class="bi bi-person-badge me-1"></i>
+                    {% if LANGUAGE == 'ar' %}نوع الحساب (اختياري)
+                    {% elif LANGUAGE == 'fr' %}Type de compte (optionnel)
+                    {% else %}Account Type (Optional){% endif %}
+                </label>
+                <div class="account-type-cards">
+                    <!-- None Card - Regular User (No special role) -->
+                    <label class="account-type-card none">
+                        <input type="radio" name="account_type" value="none" id="type_none" checked>
+                        <div class="card-content">
+                            <i class="bi bi-person-circle"></i>
+                            <div class="card-title">
+                                {% if LANGUAGE == 'ar' %}حساب عادي
+                                {% elif LANGUAGE == 'fr' %}Compte standard
+                                {% else %}Regular Account{% endif %}
+                            </div>
+                            <div class="card-desc">
+                                {% if LANGUAGE == 'ar' %}تصفح الأخبار والتحققات
+                                {% elif LANGUAGE == 'fr' %}Parcourir les actualités et vérifications
+                                {% else %}Browse news and fact-checks{% endif %}
+                            </div>
+                        </div>
+                    </label>
+                    <!-- Journalist Card -->
+                    <label class="account-type-card journalist">
+                        <input type="radio" name="account_type" value="journalist" id="type_journalist">
+                        <div class="card-content">
+                            <i class="bi bi-newspaper"></i>
+                            <div class="card-title">
+                                {% if LANGUAGE == 'ar' %}صحفي
+                                {% elif LANGUAGE == 'fr' %}Journaliste
+                                {% else %}Journalist{% endif %}
+                            </div>
+                            <div class="card-desc">
+                                {% if LANGUAGE == 'ar' %}نشر المقالات والتحقق
+                                {% elif LANGUAGE == 'fr' %}Publier des articles et vérifier
+                                {% else %}Publish articles and verify{% endif %}
+                            </div>
+                        </div>
+                    </label>
+                    <!-- Media Organization Card -->
+                    <label class="account-type-card media">
+                        <input type="radio" name="account_type" value="media" id="type_media">
+                        <div class="card-content">
+                            <i class="bi bi-building"></i>
+                            <div class="card-title">
+                                {% if LANGUAGE == 'ar' %}مؤسسة إعلامية
+                                {% elif LANGUAGE == 'fr' %}Organisation médiatique
+                                {% else %}Media Organization{% endif %}
+                            </div>
+                            <div class="card-desc">
+                                {% if LANGUAGE == 'ar' %}تسجيل مؤسسة أو صحيفة
+                                {% elif LANGUAGE == 'fr' %}Inscription d'une organisation ou d'un journal
+                                {% else %}Register an organization or newspaper{% endif %}
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="note-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {% if LANGUAGE == 'ar' %}يمكنك ترك الحساب عادياً إذا كنت قارئاً فقط
+                    {% elif LANGUAGE == 'fr' %}Vous pouvez laisser le compte standard si vous êtes uniquement lecteur
+                    {% else %}You can leave the account as regular if you're just a reader{% endif %}
+                </div>
+            </div>
+
+            <!-- Hidden fields to store actual form values -->
+            <input type="hidden" name="is_journalist" id="is_journalist" value="">
+            <input type="hidden" name="is_media_organization" id="is_media_organization" value="">
+
+            <!-- Username Field -->
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-person me-1"></i>
+                    {% if LANGUAGE == 'ar' %}اسم المستخدم
+                    {% elif LANGUAGE == 'fr' %}Nom d'utilisateur
+                    {% else %}Username{% endif %}
+                </label>
+                <input type="text" name="username" id="id_username" class="vd-form-control" 
+                    placeholder="{% if LANGUAGE == 'ar' %}اختر اسم مستخدم{% elif LANGUAGE == 'fr' %}Choisissez un nom d'utilisateur{% else %}Choose a username{% endif %}" 
+                    required autocomplete="off">
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-envelope me-1"></i>
+                    {% if LANGUAGE == 'ar' %}البريد الإلكتروني
+                    {% elif LANGUAGE == 'fr' %}Adresse e-mail
+                    {% else %}Email Address{% endif %}
+                </label>
+                <input type="email" name="email" id="id_email" class="vd-form-control" 
+                    placeholder="{% if LANGUAGE == 'ar' %}example@domain.com{% elif LANGUAGE == 'fr' %}exemple@domaine.com{% else %}example@domain.com{% endif %}" 
+                    required>
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-lock me-1"></i>
+                    {% if LANGUAGE == 'ar' %}كلمة المرور
+                    {% elif LANGUAGE == 'fr' %}Mot de passe
+                    {% else %}Password{% endif %}
+                </label>
+                <input type="password" name="password1" id="id_password1" class="vd-form-control" 
+                    placeholder="{% if LANGUAGE == 'ar' %}••••••••{% elif LANGUAGE == 'fr' %}••••••••{% else %}••••••••{% endif %}" 
+                    required>
+                <div class="password-strength">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="strength-text" id="strengthText"></div>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="form-group">
+                <label class="vd-label"><i class="bi bi-lock-fill me-1"></i>
+                    {% if LANGUAGE == 'ar' %}تأكيد كلمة المرور
+                    {% elif LANGUAGE == 'fr' %}Confirmer le mot de passe
+                    {% else %}Confirm Password{% endif %}
+                </label>
+                <input type="password" name="password2" id="id_password2" class="vd-form-control" 
+                    placeholder="{% if LANGUAGE == 'ar' %}أعد كتابة كلمة المرور{% elif LANGUAGE == 'fr' %}Répétez le mot de passe{% else %}Retype password{% endif %}" 
+                    required>
+            </div>
+
+            <!-- Organization Field (shows only when Media Organization is selected) -->
+            <div class="form-group organization-field" id="organizationField">
+                <label class="vd-label"><i class="bi bi-building me-1"></i>
+                    {% if LANGUAGE == 'ar' %}اسم المؤسسة / الصحيفة
+                    {% elif LANGUAGE == 'fr' %}Nom de l'organisation / journal
+                    {% else %}Organization / Newspaper Name{% endif %}
+                </label>
+                <input type="text" name="organization" id="id_organization" class="vd-form-control" 
+                    placeholder="{% if LANGUAGE == 'ar' %}مثال: جريدة الوطن، مؤسسة الإعلام الجزائرية{% elif LANGUAGE == 'fr' %}Ex: El Watan, APS{% else %}Example: El Watan, APS{% endif %}">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="bi bi-person-plus me-2"></i>
+                {% if LANGUAGE == 'ar' %}إنشاء الحساب
+                {% elif LANGUAGE == 'fr' %}Créer le compte
+                {% else %}Create Account{% endif %}
+            </button>
+        </form>
+
+        <div class="login-link">
+            <span class="text-vd-silver" style="font-size:0.9rem;">
+                {% if LANGUAGE == 'ar' %}لديك حساب بالفعل؟ 
+                {% elif LANGUAGE == 'fr' %}Vous avez déjà un compte ? 
+                {% else %}Already have an account? {% endif %}
+            </span>
+            <a href="/accounts/login/" class="text-vd-accent" style="font-size:0.9rem;font-weight:700;text-decoration:none;">
+                {% if LANGUAGE == 'ar' %}تسجيل الدخول
+                {% elif LANGUAGE == 'fr' %}Connexion
+                {% else %}Login{% endif %}
+                <i class="bi bi-arrow-left ms-1"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Account type selection handling
+const noneRadio = document.getElementById('type_none');
+const journalistRadio = document.getElementById('type_journalist');
+const mediaRadio = document.getElementById('type_media');
+const isJournalistField = document.getElementById('is_journalist');
+const isMediaField = document.getElementById('is_media_organization');
+const organizationField = document.getElementById('organizationField');
+
+function updateAccountType() {
+    if (noneRadio.checked) {
+        isJournalistField.value = '';
+        isMediaField.value = '';
+        organizationField.classList.remove('visible');
+    } else if (journalistRadio.checked) {
+        isJournalistField.value = 'on';
+        isMediaField.value = '';
+        organizationField.classList.remove('visible');
+    } else if (mediaRadio.checked) {
+        isJournalistField.value = '';
+        isMediaField.value = 'on';
+        organizationField.classList.add('visible');
+    }
+}
+
+noneRadio.addEventListener('change', updateAccountType);
+journalistRadio.addEventListener('change', updateAccountType);
+mediaRadio.addEventListener('change', updateAccountType);
+
+// Initialize
+updateAccountType();
+
+// Password strength checker
+const passwordInput = document.getElementById('id_password1');
+const strengthBar = document.getElementById('strengthBar');
+const strengthText = document.getElementById('strengthText');
+
+function checkPasswordStrength(password) {
+    let strength = 0;
+    const texts = {
+        ar: ['ضعيف جداً', 'ضعيف', 'متوسط', 'قوي', 'قوي جداً'],
+        fr: ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'],
+        en: ['Very weak', 'Weak', 'Medium', 'Strong', 'Very strong']
+    };
+    const lang = '{{ LANGUAGE|default:"ar" }}';
+    const langTexts = texts[lang] || texts.ar;
+    
+    if (password.length > 0) {
+        if (password.length >= 8) strength++;
+        if (password.length >= 12) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+    }
+    
+    strength = Math.min(strength, 4);
+    
+    const classes = ['weak', 'weak', 'medium', 'strong', 'very-strong'];
+    const barClass = classes[strength];
+    const barWidth = [25, 25, 50, 75, 100][strength];
+    const textIndex = [0, 1, 2, 3, 4][strength];
+    
+    strengthBar.className = 'strength-bar ' + barClass;
+    strengthBar.style.width = barWidth + '%';
+    strengthText.textContent = langTexts[textIndex];
+    strengthText.style.color = barClass === 'weak' ? '#ef4444' : barClass === 'medium' ? '#f59e0b' : '#34d399';
+}
+
+passwordInput.addEventListener('input', function() {
+    checkPasswordStrength(this.value);
+});
+
+// Form validation before submit
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    const password1 = document.getElementById('id_password1').value;
+    const password2 = document.getElementById('id_password2').value;
+    
+    if (password1 !== password2) {
+        e.preventDefault();
+        alert('{% if LANGUAGE == 'ar' %}كلمة المرور غير متطابقة!{% elif LANGUAGE == 'fr' %}Les mots de passe ne correspondent pas !{% else %}Passwords do not match!{% endif %}');
+        return false;
+    }
+    
+    if (password1.length < 6) {
+        e.preventDefault();
+        alert('{% if LANGUAGE == 'ar' %}كلمة المرور يجب أن تكون 6 أحرف على الأقل!{% elif LANGUAGE == 'fr' %}Le mot de passe doit comporter au moins 6 caractères !{% else %}Password must be at least 6 characters!{% endif %}');
+        return false;
+    }
+});
+
+// Remove messages after 5 seconds
+setTimeout(() => {
+    document.querySelectorAll('.vd-alert').forEach(el => {
+        el.style.transition = 'opacity 0.5s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+    });
+}, 5000);
+</script>
+{% endblock %}
