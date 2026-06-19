@@ -5,18 +5,9 @@ from dotenv import load_dotenv
 import dj_database_url
 from django.utils.translation import gettext_lazy as _
 
-# ─── تحميل .env ──────────────────────────────────────────────────────────────
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-env_path = BASE_DIR / '.env'
-
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
-    print(f"✅ .env loaded from: {env_path}")
-else:
-    print(f"⚠️ .env not found at: {env_path}")
-
-print(f"🔑 GROQ_API_KEY: {os.environ.get('GROQ_API_KEY', 'NOT FOUND')[:15]}...")
-print(f"🔑 GEMINI_API_KEY: {os.environ.get('GEMINI_API_KEY', 'NOT FOUND')[:15]}...")
 
 # ─── Security ────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
@@ -117,7 +108,7 @@ TIME_ZONE = 'Africa/Algiers'
 USE_I18N = True
 USE_TZ = True
 
-# اللغات المدعومة
+# ✅ اللغات المدعومة
 LANGUAGES = [
     ('ar', _('العربية')),
     ('fr', _('Français')),
@@ -153,8 +144,9 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ─── APIs ─────────────────────────────────────────────────────────────────────
-GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+# ✅ Gemini API Key (supports both AIza and AQ. formats)
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 
 # ─── Production security extras ──────────────────────────────────────────────
 if not DEBUG:
